@@ -46,9 +46,3 @@ elementární rozšíření
 - figury musí být representovány objekty vlastních tříd s využitím dědičnosti (ze třídy Figura odvozené třídy Dáma a Kámen)
 - pro representaci herního stavu je použito dvojrozměrné pole (např. seznam seznamů)
 - možné tahy jsou representovány jako spojové stromy (obdoba binárních stromů s možností až čtyř dětských uzlů)
-
-**Random**
-- Pass
-- pass
-- pass random test PC2
-- random test for PC2 version 2
