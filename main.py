@@ -1,0 +1,1 @@
+#Hlavní část programu 
