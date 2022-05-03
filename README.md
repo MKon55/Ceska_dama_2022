@@ -44,5 +44,5 @@ elementární rozšíření
 
 **Povinné implementační detaily**
 - figury musí být representovány objekty vlastních tříd s využitím dědičnosti (ze třídy Figura odvozené třídy Dáma a Kámen)
-- pro representaci herního stavu je použito dvojrozměrné pole (např. seznam seznamů)
+- pro representaci herního stavu je použito dvojrozměrné pole (např. seznam seznamů) => **splněno** 
 - možné tahy jsou representovány jako spojové stromy (obdoba binárních stromů s možností až čtyř dětských uzlů)
