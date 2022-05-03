@@ -51,3 +51,4 @@ elementární rozšíření
 - Pass
 - pass
 - pass random test PC2
+- random test for PC2 version 2
