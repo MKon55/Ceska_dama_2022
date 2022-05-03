@@ -50,3 +50,4 @@ elementární rozšíření
 **Random**
 - Pass
 - pass
+- pass random test PC2
