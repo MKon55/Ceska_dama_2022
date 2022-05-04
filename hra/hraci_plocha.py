@@ -33,6 +33,7 @@ class Hraci_plocha:
                         self.herni_plocha[row].append(0) #Jestliže na místě není hrací kámen tak 0 
                 else:
                     self.herni_plocha[row].append(0)
+                    
     #Metoda vykreslí hrací kameny a hrací pole => hrací plochu    
     def draw(self, win):
         self.draw_squares(win)

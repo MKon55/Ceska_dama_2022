@@ -4,13 +4,13 @@ import pygame
 from .hodnoty import SQUARE_SIZE
 
 class Hraci_kamen:
-    PADDING = 20
+    PADDING = 20 #určení velikosti hracího kamene ve prostoru 
 
     def __init__(self, row, col, color):
         self.row = row
         self.col = col
         self.color = color
-        self.king = False #pro vytvoření hracího kamene dámy, kontrola zda jsem dáma či ne     
+        self.dama = False #pro vytvoření hracího kamene dámy, kontrola zda jsem dáma či ne     
         self.x = 0 #x pro col
         self.y = 0 #y pro row
         self.calc_pos()
@@ -22,8 +22,8 @@ class Hraci_kamen:
         self.y = SQUARE_SIZE * self.row + SQUARE_SIZE // 2
     
     #Metoda co čistě jenom určí že náš hrací kámen jest nyní dáma   
-    def make_king(self):
-        self.king = True
+    def dama(self):
+        self.dama = True
     
     #Metoda vykreslí hrací kámen 
     def draw(self, win):

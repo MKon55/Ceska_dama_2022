@@ -1,9 +1,9 @@
 # Hlavní část programu 
-# Pro pygame => pip install pygame (docker to má automaticky)
+# Pro pygame => pip install pygame 
 
 import pygame 
 
-#Importování modulu ze hodnot
+#Importování modulu ze hra
 from hra.hodnoty import WIDTH, HEIGHT 
 from hra.hraci_plocha import Hraci_plocha
 
@@ -33,3 +33,11 @@ def main():
     pygame.quit() #ukončení window pro hru
     
 main()
+
+#vytvoření "předgui" pro načtení ze souboru .csv nebo začátek nové partie 
+#   Něco jako main menu ve hře 
+#   Vedle hracího pole ještě počet herních kamenů, počet dám a jaký hráč je na tahu 
+#       Viz Fišerova práce na přednášce 
+#Potřeba tedy vytvořit načtení pozic do hracího pole ze .csv souboru
+#   Zároveň uložit kdykoliv partii do .csv souboru
+#Začátek nové partie již můžeme začít pomocí již daného kodu 
