@@ -36,8 +36,9 @@ main()
 
 #vytvoření "předgui" pro načtení ze souboru .csv nebo začátek nové partie 
 #   Něco jako main menu ve hře 
-#   Vedle hracího pole ještě počet herních kamenů, počet dám a jaký hráč je na tahu 
+#   Vedle hracího pole ještě počet herních kamenů, počet dám a jaký hráč je na tahu (převděpodobně na pravé straně okna pygame)
 #       Viz Fišerova práce na přednášce 
-#Potřeba tedy vytvořit načtení pozic do hracího pole ze .csv souboru
-#   Zároveň uložit kdykoliv partii do .csv souboru
+#Potřeba tedy vytvořit načtení pozic do hracího pole ze .csv souboru (pokusím se implementovat ale mám problém s pochopením)
+#   Zároveň uložit kdykoliv partii do .csv souboru (cyklus který vezmu nynější pozici hracích kamenu a toho kdo je na tahu)
+#   Specifické pojmenování a rozložení dat musí být spleněno jinak exception!!
 #Začátek nové partie již můžeme začít pomocí již daného kodu 

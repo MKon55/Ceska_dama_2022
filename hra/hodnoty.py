@@ -1,5 +1,5 @@
 #Neměné hodnoty (musíme importovat jako)
-#Usnadnění práce pro rozhraní hry
+#   Usnadnění práce pro rozhraní hry, samozžejmě že takto nemusíme ale příjde mi to přehlednější 
 
 import pygame
 
