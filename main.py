@@ -21,6 +21,8 @@ def main():
 
     print(File_manager().read_file("savegame1"))
 
+    File_manager().save_file(plocha.herni_plocha, "savegame2")
+
     while hra:
         cas_hry.tick(FPS)
 

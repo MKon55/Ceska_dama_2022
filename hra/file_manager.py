@@ -2,6 +2,7 @@ import csv
 import re
 from pathlib import Path
 from .hraci_plocha import Hraci_plocha
+from .hodnoty import ROW, COL, BLACK, WHITE
 
 
 class File_manager:
@@ -35,6 +36,31 @@ class File_manager:
                     board.append(row)
                     occupied_tiles.append(row[0])
         return board
+
+    @staticmethod
+    def save_file(board, filename):
+        save_string = ""
+
+        for row in board:
+            for stone in row:
+                if stone == 0:  # Empty square
+                    continue
+                save_string += File_manager._format_output(stone.row, stone.col, stone.color, stone.queen) + "\n"
+
+        base_path = Path(__file__).parent
+        file_path = (base_path / f"../{filename}.csv").resolve()
+        with open(file_path, 'w') as file:
+            file.write(save_string)
+        print(f"Saving to {file_path} as:\n{save_string}")
+
+    @staticmethod
+    def _format_output(row, col, color, queen):
+        color_symbol = ""
+        if color == BLACK:
+            color_symbol = "b"
+        elif color == WHITE:
+            color_symbol = "w"
+        return f"{Hraci_plocha.coordinates_to_notation(row, col)},{color_symbol if not queen else color_symbol * 2}"
 
     @staticmethod
     def check_format(row):
