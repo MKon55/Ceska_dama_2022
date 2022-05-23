@@ -31,6 +31,33 @@ class Hraci_plocha:
                 else:
                     self._herni_plocha[row].append(0)
 
+    def load_board(self, board):  # Format: [['a1', 'w'], ['c1', 'w'], ['e1', 'ww']m ... ['b4', 'b']]
+        self.clear_board()
+
+        for stone in board:
+            notation = stone[0]
+            color_and_queen = stone[1]
+
+            position = Hraci_plocha.notation_to_coordinates(notation)
+            row = position[0]
+            col = position[1]
+
+            if color_and_queen == "b":
+                self._herni_plocha[row][col] = Hraci_kamen(row, col, BLACK, False)
+            elif color_and_queen == "bb":
+                self._herni_plocha[row][col] = Hraci_kamen(row, col, BLACK, True)
+            elif color_and_queen == "w":
+                self._herni_plocha[row][col] = Hraci_kamen(row, col, WHITE, False)
+            elif color_and_queen == "ww":
+                self._herni_plocha[row][col] = Hraci_kamen(row, col, WHITE, True)
+
+    def clear_board(self):
+        self._herni_plocha = []
+        for row in range(ROW):
+            self._herni_plocha.append([])
+            for col in range(COL):
+                self._herni_plocha[row].append(0)
+
     # Metoda vykreslí hrací kameny a hrací pole => hrací plochu
     def draw(self, win):
         self.draw_squares(win)

@@ -19,7 +19,9 @@ def main():
     cas_hry = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
     plocha = Hraci_plocha()
 
-    print(File_manager().read_file("savegame1"))
+    loaded_game = File_manager().read_file("savegame1")
+    print(loaded_game)
+    plocha.load_board(loaded_game)
 
     File_manager().save_file(plocha.herni_plocha, "savegame2")
 
