@@ -4,7 +4,7 @@
 import pygame
 
 #Importování modulu ze game
-from game.stat_values import WIDTH, HEIGHT
+from game.stat_values import WIDTH, HEIGHT, SQUARE_SIZE
 from game.game_board import Game_board
 from game.file_manager import File_manager
 
@@ -13,17 +13,24 @@ FPS = 60
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dáma")  # Název hry
 
+#Metoda která určit row, col pozice naší myši 
+def get_mouse_pos(pos):
+    x, y = pos
+    row = y // SQUARE_SIZE
+    col = x // SQUARE_SIZE
+    return row, col
 
 def main():
     game = True
     gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
     board = Game_board()
 
-    loaded_game = File_manager().read_file("savegame1")
-    print(loaded_game)
-    board.load_board(loaded_game)
+    #Načítání a ukládání ze partie 
+    #loaded_game = File_manager().read_file("savegame1")
+    #print(loaded_game)
+    #board.load_board(loaded_game)
 
-    File_manager().save_file(board.game_board, "savegame2")
+    #File_manager().save_file(board.game_board, "savegame2")
 
     while game:
         gaming_time.tick(FPS)
@@ -34,7 +41,11 @@ def main():
                 game = False
 
             if event.type == pygame.MOUSEBUTTONUP:  # Pro klikání myší, zjišťuje na co jsme klikly a co můžeme dělat
-                pass
+                pos = pygame.mouse.get_pos()
+                row, col = get_mouse_pos(pos)
+                stone = board.get_stone(row, col)
+                #Testovací jednotka pro kliknuti.pohyb
+                #board.movement(stone, 4, 3)
 
         board.draw(WINDOW)
         pygame.display.update()  # Pro update hracího pole když hrajeme hru

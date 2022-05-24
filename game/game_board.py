@@ -10,8 +10,8 @@ from .stone import Stone
 class Game_board:
     def __init__(self):
         self._game_board = []
-        self.red_left = self.white_left = 12
-        self.red_queens = self.white_queens = 0
+        self.black_left = self.white_left = 12
+        self.black_queens = self.white_queens = 0
         self.create_game_board()
 
     # Metody vytvoří herní plochu
@@ -31,6 +31,7 @@ class Game_board:
                 else:
                     self._game_board[row].append(0)
 
+    #Metoda pro načtení hrací plochy
     def load_board(self, board):  # Format: [['a1', 'w'], ['c1', 'w'], ['e1', 'ww']m ... ['b4', 'b']]
         self.clear_board()
 
@@ -51,6 +52,7 @@ class Game_board:
             elif color_and_queen == "ww":
                 self._game_board[row][col] = Stone(row, col, WHITE, True)
 
+    #Vyčištení hrací plochy
     def clear_board(self):
         self._game_board = []
         for row in range(ROW):
@@ -75,6 +77,25 @@ class Game_board:
             for col in range(row % 2, COL, 2):
                 # topleft = 0,0 (x směrem do prava a y směrem dolu )
                 pygame.draw.rect(win, BOARD_WHITE, (row*SQUARE_SIZE, col * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+                
+    #Metoda pro pohyb
+    #1. pohyb kamene v listu + 2. update 
+    def movement(self, stone, row, col):
+        # Prohození pozic hodnot; nemusíme vytvářet temp
+        self.game_board[stone.row][stone.col], self.game_board[row][col] = self.game_board[row][col], self.game_board[stone.row][stone.col]
+        stone.movement(row, col)
+        
+        #Kontrola zda jsme na pozici kdy se stone může stát queen + update hodnot self.black_queens a self.white_queens 
+        if row == ROW or row == 0: #Jestliže jsme na pozici 0 nebo 7 tak jsme na konci či začátku hrací plohcy => kámen se stává dámou 
+            stone.make_queen()
+            if stone.color == BLACK:
+                self.black_queens += 1
+            else: 
+                self.white_queens += 1
+       
+    #Metoda pro stone aby jsme jej mohli předat do movement v main()         
+    def get_stone(self, row, col):
+        return self.game_board[row][col]
 
     @property
     def game_board(self):
