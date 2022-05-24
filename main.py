@@ -18,8 +18,17 @@ WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dáma")  # Název hry
 
 
-def start_the_game():
+def start_players():
     main()
+
+
+def start_ai():
+    main()
+
+
+def load_game():
+    loaded_game = File_manager().read_file("savegame1")
+    main(loaded_game)
 
 
 def main_menu():  # Main menu (opens first)
@@ -38,22 +47,22 @@ def main_menu():  # Main menu (opens first)
 
     menu = pygame_menu.Menu('Dáma', WIDTH, HEIGHT, theme=mytheme)
 
-    menu.add.button('Hrát ve dvou', start_the_game)
-    menu.add.button('Hrát proti AI', start_the_game)
-    menu.add.button('Nahrát hru', start_the_game)
+    menu.add.button('Hrát ve dvou', start_players)
+    menu.add.button('Hrát proti AI', start_ai)
+    menu.add.button('Nahrát hru', load_game)
     menu.add.button('Ukončit', pygame_menu.events.EXIT)
 
     menu.mainloop(WINDOW)
 
 
-def main():  # Main game loop
+def main(loaded_game=None):  # Main game loop
     game = True
     gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
     board = Game_board()
 
-    loaded_game = File_manager().read_file("savegame1")
-    print(loaded_game)
-    board.load_board(loaded_game)
+    if loaded_game is not None:
+        print(loaded_game)
+        board.load_board(loaded_game)
 
     File_manager().save_file(board.game_board, "savegame2")
 
