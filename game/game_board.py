@@ -3,33 +3,33 @@
 
 import pygame
 # musí být . jinak neví že .py je ve stejné složce
-from .hodnoty import BOARD_BLACK, BOARD_WHITE, SQUARE_SIZE, ROW, COL, BLACK, WHITE
-from .hraci_kamen import Hraci_kamen
+from .stat_values import BOARD_BLACK, BOARD_WHITE, SQUARE_SIZE, ROW, COL, BLACK, WHITE
+from .stone import Stone
 
 
-class Hraci_plocha:
+class Game_board:
     def __init__(self):
-        self._herni_plocha = []
+        self._game_board = []
         self.red_left = self.white_left = 12
-        self.red_kings = self.white_kings = 0
-        self.vytvoreni_herni_plochy()
+        self.red_queens = self.white_queens = 0
+        self.create_game_board()
 
     # Metody vytvoří herní plochu
-    def vytvoreni_herni_plochy(self):
+    def create_game_board(self):
         for row in range(ROW):
-            self._herni_plocha.append([])  # List pro každou řadu
+            self._game_board.append([])  # List pro každou řadu
             for col in range(COL):
                 if col % 2 == ((row + 1) % 2):
                     if row < 3:
-                        self._herni_plocha[row].append(
-                            Hraci_kamen(row, col, BLACK))
+                        self._game_board[row].append(
+                            Stone(row, col, BLACK))
                     elif row > 4:
-                        self._herni_plocha[row].append(
-                            Hraci_kamen(row, col, WHITE))
+                        self._game_board[row].append(
+                            Stone(row, col, WHITE))
                     else:  # Jestliže na místě není hrací kámen tak 0
-                        self._herni_plocha[row].append(0)
+                        self._game_board[row].append(0)
                 else:
-                    self._herni_plocha[row].append(0)
+                    self._game_board[row].append(0)
 
     def load_board(self, board):  # Format: [['a1', 'w'], ['c1', 'w'], ['e1', 'ww']m ... ['b4', 'b']]
         self.clear_board()
@@ -38,32 +38,32 @@ class Hraci_plocha:
             notation = stone[0]
             color_and_queen = stone[1]
 
-            position = Hraci_plocha.notation_to_coordinates(notation)
+            position = Game_board.notation_to_coordinates(notation)
             row = position[0]
             col = position[1]
 
             if color_and_queen == "b":
-                self._herni_plocha[row][col] = Hraci_kamen(row, col, BLACK, False)
+                self._game_board[row][col] = Stone(row, col, BLACK, False)
             elif color_and_queen == "bb":
-                self._herni_plocha[row][col] = Hraci_kamen(row, col, BLACK, True)
+                self._game_board[row][col] = Stone(row, col, BLACK, True)
             elif color_and_queen == "w":
-                self._herni_plocha[row][col] = Hraci_kamen(row, col, WHITE, False)
+                self._game_board[row][col] = Stone(row, col, WHITE, False)
             elif color_and_queen == "ww":
-                self._herni_plocha[row][col] = Hraci_kamen(row, col, WHITE, True)
+                self._game_board[row][col] = Stone(row, col, WHITE, True)
 
     def clear_board(self):
-        self._herni_plocha = []
+        self._game_board = []
         for row in range(ROW):
-            self._herni_plocha.append([])
+            self._game_board.append([])
             for col in range(COL):
-                self._herni_plocha[row].append(0)
+                self._game_board[row].append(0)
 
     # Metoda vykreslí hrací kameny a hrací pole => hrací plochu
     def draw(self, win):
         self.draw_squares(win)
         for row in range(ROW):
             for col in range(COL):
-                piece = self._herni_plocha[row][col]
+                piece = self._game_board[row][col]
                 if piece != 0:
                     piece.draw(win)
 
@@ -77,16 +77,16 @@ class Hraci_plocha:
                 pygame.draw.rect(win, BOARD_WHITE, (row*SQUARE_SIZE, col * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
     @property
-    def herni_plocha(self):
-        return self._herni_plocha
+    def game_board(self):
+        return self._game_board
 
-    @herni_plocha.setter
-    def herni_plocha(self, value):
-        self._herni_plocha = value
+    @game_board.setter
+    def game_board(self, value):
+        self._game_board = value
 
-    @herni_plocha.deleter
-    def herni_plocha(self):
-        del self._herni_plocha
+    @game_board.deleter
+    def game_board(self):
+        del self._game_board
 
     @staticmethod
     def notation_to_coordinates(notation):
@@ -101,7 +101,7 @@ class Hraci_plocha:
 
     @staticmethod
     def is_black_tile(tile_notation):
-        coordinates = Hraci_plocha.notation_to_coordinates(tile_notation)
+        coordinates = Game_board.notation_to_coordinates(tile_notation)
         row = coordinates[0]
         col = coordinates[1]
         if row % 2 == 0:  # Odd rows - black tiles are on odd cols

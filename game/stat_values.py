@@ -1,4 +1,4 @@
-#Neměné hodnoty (musíme importovat jako)
+#Neměné hodnoty (musíme importovat jako), Static Values
 #   Usnadnění práce pro rozhraní hry, samozžejmě že takto nemusíme ale příjde mi to přehlednější 
 
 import pygame
