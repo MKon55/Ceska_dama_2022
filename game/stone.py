@@ -1,10 +1,10 @@
 #Informace pro hrací kámen ktety bude improtován do hracího plochy
 
 import pygame
-from .hodnoty import SQUARE_SIZE
+from .stat_values import SQUARE_SIZE
 
 
-class Hraci_kamen:
+class Stone:
     PADDING = 20  # určení velikosti hracího kamene ve prostoru
 
     def __init__(self, row, col, color, queen=False):
