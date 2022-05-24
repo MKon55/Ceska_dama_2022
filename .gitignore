@@ -1,2 +1,4 @@
 .idea/
-__pycache__/
+__pycache/
+game/__pycache__/
+game/__pycache__/*
