@@ -1,8 +1,8 @@
 import csv
 import re
 from pathlib import Path
-from .hraci_plocha import Hraci_plocha
-from .hodnoty import ROW, COL, BLACK, WHITE
+from .game_board import Game_board
+from .stat_values import ROW, COL, BLACK, WHITE
 
 
 class File_manager:
@@ -30,7 +30,7 @@ class File_manager:
                     if row[0] in occupied_tiles:  # tile is already occupied
                         raise FileManagerException(f"Multiple pieces on one tile: \"{row[0]}\"")
 
-                    if not Hraci_plocha.is_black_tile(row[0]):  # Piece is on a white tile
+                    if not Game_board.is_black_tile(row[0]):  # Piece is on a white tile
                         raise FileManagerException(f"Invalid position: \"{row[0]}\"")
 
                     board.append(row)
@@ -60,7 +60,7 @@ class File_manager:
             color_symbol = "b"
         elif color == WHITE:
             color_symbol = "w"
-        return f"{Hraci_plocha.coordinates_to_notation(row, col)},{color_symbol if not queen else color_symbol * 2}"
+        return f"{Game_board.coordinates_to_notation(row, col)},{color_symbol if not queen else color_symbol * 2}"
 
     @staticmethod
     def check_format(row):

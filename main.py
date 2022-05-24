@@ -3,10 +3,10 @@
 
 import pygame
 
-#Importování modulu ze hra
-from hra.hodnoty import WIDTH, HEIGHT
-from hra.hraci_plocha import Hraci_plocha
-from hra.file_manager import File_manager
+#Importování modulu ze game
+from game.stat_values import WIDTH, HEIGHT
+from game.game_board import Game_board
+from game.file_manager import File_manager
 
 FPS = 60
 
@@ -15,28 +15,28 @@ pygame.display.set_caption("Dáma")  # Název hry
 
 
 def main():
-    hra = True
-    cas_hry = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
-    plocha = Hraci_plocha()
+    game = True
+    gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
+    board = Game_board()
 
     loaded_game = File_manager().read_file("savegame1")
     print(loaded_game)
-    plocha.load_board(loaded_game)
+    board.load_board(loaded_game)
 
-    File_manager().save_file(plocha.herni_plocha, "savegame2")
+    File_manager().save_file(board.game_board, "savegame2")
 
-    while hra:
-        cas_hry.tick(FPS)
+    while game:
+        gaming_time.tick(FPS)
 
         for event in pygame.event.get():
             # Event pro pygame => ukončení hry (button)
             if event.type == pygame.QUIT:
-                hra = False
+                game = False
 
             if event.type == pygame.MOUSEBUTTONUP:  # Pro klikání myší, zjišťuje na co jsme klikly a co můžeme dělat
                 pass
 
-        plocha.draw(WINDOW)
+        board.draw(WINDOW)
         pygame.display.update()  # Pro update hracího pole když hrajeme hru
 
     pygame.quit()  # ukončení window pro hru
