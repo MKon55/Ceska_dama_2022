@@ -1,6 +1,6 @@
 # Hlavní část programu
 # Pro pygame => pip install pygame
-
+# Testikos Přepalos
 import pygame
 
 #Importování modulu ze game
