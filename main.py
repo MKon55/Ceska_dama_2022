@@ -7,27 +7,35 @@ import pygame_menu
 import pygame_gui
 from pygame_gui.windows.ui_file_dialog import UIFileDialog
 from pygame.rect import Rect
+from game.game_board import Game_board
 
 #Importování modulu ze game
-from game.stat_values import WIDTH, HEIGHT
-from game.game_board import Game_board
+from game.stat_values import WIDTH, HEIGHT, SQUARE_SIZE
 from game.file_manager import File_manager
+from game.game_movement import Gameing
 
 FPS = 60
 
 pygame.init()
-WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dáma")  # Název hry
 
-
+#Metoda která určit row, col pozice naší myši 
+def get_mouse_pos(pos):
+    x, y = pos
+    row = y // SQUARE_SIZE
+    col = x // SQUARE_SIZE
+    return row, col
+  
+# Start the game with 2 players
 def start_players():
     main()
 
-
+# Start the game against ai
 def start_ai():
     main()
 
-
+# Start the game from a .csv file
 def load_game():
     path_to_file = file_picker()
     if path_to_file is None:
@@ -35,8 +43,8 @@ def load_game():
     loaded_game = File_manager().read_file(path_to_file)
     main(loaded_game)
 
-
-def main_menu():  # Main menu (opens first)
+# Main menu (opens first)
+def main_menu():
     mytheme = pygame_menu.Theme(background_color=(204, 255, 224),
                                 title_background_color=(25, 200, 25),
                                 title_font_shadow=False,
@@ -57,9 +65,9 @@ def main_menu():  # Main menu (opens first)
     menu.add.button('Nahrát hru', load_game)
     menu.add.button('Ukončit', pygame_menu.events.EXIT)
 
-    menu.mainloop(WINDOW)
+    menu.mainloop(WIN)
 
-
+# Window for picking a file to load
 def file_picker():
     window_surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -93,7 +101,7 @@ def file_picker():
 
         pygame.display.update()
 
-
+# Helping function for file_picker()
 def open_ui_file_dialog(manager):
     file_selection = UIFileDialog(rect=Rect(0, 0, WIDTH, HEIGHT), manager=manager, allow_picking_directories=False, window_title="Vybrat uloženou hru")
     file_selection.cancel_button.set_text("Zpět")
@@ -105,32 +113,38 @@ def open_ui_file_dialog(manager):
 
 
 def main(loaded_game=None):  # Main game loop
-    game = True
+    game_running = True
     gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
-    board = Game_board()
-
+    game = Gameing(WIN)
+    
+    # Load a game if we get a board
     if loaded_game is not None:
         board.load_board(loaded_game)
 
     #File_manager().save_file(board.game_board, "savegame2")
 
-    while game:
+    while game_runing:
         gaming_time.tick(FPS)
+
+        #Win => ukončení hry, potom můžeme vylepšit 
+        if  game.game_winner() != None:
+            print("The mission, the nightmare... they are finally... over.")
+            game_runing = False
 
         for event in pygame.event.get():
             # Event pro pygame => ukončení hry (button)
             if event.type == pygame.QUIT:
-                game = False
+                game_runing = False
 
             if event.type == pygame.MOUSEBUTTONUP:  # Pro klikání myší, zjišťuje na co jsme klikly a co můžeme dělat
-                pass
+                pos = pygame.mouse.get_pos()
+                row, col = get_mouse_pos(pos)
+                game.select(row, col)
 
-        board.draw(WINDOW)
-        pygame.display.update()  # Pro update hracího pole když hrajeme hru
+        game.update()
 
     pygame.quit()  # ukončení window pro hru
     sys.exit()
-
 
 main_menu()
 

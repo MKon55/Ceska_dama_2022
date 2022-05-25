@@ -1,5 +1,5 @@
 #Neměné hodnoty (musíme importovat jako), Static Values
-#   Usnadnění práce pro rozhraní hry, samozžejmě že takto nemusíme ale příjde mi to přehlednější 
+#Usnadnění práce pro rozhraní hry, samozžejmě že takto nemusíme ale příjde mi to přehlednější 
 
 import pygame
 
@@ -18,3 +18,6 @@ GREEN = (0, 100, 0)
 #Hrací pole barvy
 BOARD_WHITE = (232,208,170)
 BOARD_BLACK = (166,125,93)
+
+#Načtení crown from assets + transform pro správnou velikost
+CROWN = pygame.transform.scale(pygame.image.load('assets/crown3.png'), (40, 30))
