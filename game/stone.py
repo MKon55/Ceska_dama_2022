@@ -1,7 +1,7 @@
 #Informace pro hrací kámen ktety bude improtován do hracího plochy
 
 import pygame
-from .stat_values import SQUARE_SIZE
+from .stat_values import SQUARE_SIZE, CROWN
 
 
 class Stone:
@@ -24,13 +24,22 @@ class Stone:
 
     #Metoda co čistě jenom určí že náš hrací kámen jest nyní dáma
     #   Můžeme použít .png obrázek korunky pro tvorbu dámy
-    def queen(self):
+    def make_queen(self):
         self.queen = True
 
     #Metoda vykreslí hrací kámen
     def draw(self, win):
         radius = SQUARE_SIZE//2 - self.PADDING
         pygame.draw.circle(win, self.color, (self.x, self.y), radius)
+        #Cyklus pro vykreslení queen piece
+        if self.queen:
+            win.blit(CROWN, (self.x - CROWN.get_width()//2, self.y - CROWN.get_height()//2)) #Blit umožní vykreslení crown na hrací kámen + "matematika" pro vykreslení přímo do prostředí 
+            
+    #Metoda pro pohyb hracího kamene
+    def move(self, row, col):
+        self.row = row
+        self.col = col
+        self.calc_pos() #Přepočítání aby byl kámen přesunut na prostředek čtverce 
 
 #Potřeba stále implementovat pohyb hracího kamene (White hráč vždycky začíná jako první pokud není načteno ze partie v .csv)
 #   Implementace buď ve hrací_kamenu nebo hraci_plocha nebo vlastí specifcký soubor na pohyb
