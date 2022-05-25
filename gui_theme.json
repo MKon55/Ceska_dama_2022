@@ -1,0 +1,56 @@
+{
+  "defaults": {
+    "colours": {
+      "normal_bg":"#ccffe0",
+      "hovered_bg":"#668070",
+      "disabled_bg":"#334038",
+      "selected_bg":"#80FFB3",
+      "dark_bg":"#99BFA8",
+      "active_bg": "#80FFB3",
+      "normal_text":"#0e0e0e",
+      "hovered_text":"#0e0e0e",
+      "selected_text":"#0e0e0e",
+      "disabled_text":"#0e0e0e",
+      "active_text": "#0e0e0e",
+      "link_text": "#0000FF",
+      "link_hover": "#0000FF",
+      "link_selected": "#0000FF",
+      "text_shadow": "#777777",
+      "normal_border": "#668070",
+      "hovered_border": "#334038",
+      "disabled_border": "#334038",
+      "selected_border": "#334038",
+      "active_border": "#334038",
+      "filled_bar":"#f4251b",
+      "unfilled_bar":"#CCCCCC"
+    }
+  },
+  "window": {
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "1",
+      "enable_close_button": "0",
+      "enable_title_bar": "0"
+    }
+  },
+  "#file_dialog.#file_display_list": {
+    "colours": {
+      "normal_bg":"#ccffe0",
+      "hovered_bg":"#668070",
+      "disabled_bg":"#334038",
+      "selected_bg":"#ff0000",
+      "dark_bg":"#99BFA8"
+    }
+  },
+  "selection_list.@selection_list_item": {
+    "colours": {
+      "normal_bg":"#21282d",
+      "hovered_bg":"#668070",
+      "disabled_bg":"#334038",
+      "selected_bg":"#80FFB3",
+      "dark_bg":"#99BFA8",
+      "active_bg":"#80FFB3",
+      "normal_text": "#eeeeee"
+    }
+  }
+}

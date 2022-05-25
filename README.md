@@ -1,6 +1,12 @@
 # Ceska_dama_2022
 Seminární práce - Česká dáma APR2 
 
+# Knihovny (pip install [name])
+
+- pygame
+- pygame-menu
+- pygame-gui
+
 Zadání společné seminární práce KI/(K)APR2 2022
 **základní zadání**
 Program pro hráče hry česká dáma, poskytující náhled na stav hry, jednoduchou interakci (provedení tahu) a také elementární umělou inteligenci (náhodná volba tahu bez podpory složitější strategie)
@@ -46,3 +52,5 @@ elementární rozšíření
 - figury musí být representovány objekty vlastních tříd s využitím dědičnosti (ze třídy Figura odvozené třídy Dáma a Kámen)
 - pro representaci herního stavu je použito dvojrozměrné pole (např. seznam seznamů) => **splněno** 
 - možné tahy jsou representovány jako spojové stromy (obdoba binárních stromů s možností až čtyř dětských uzlů)
+
+**TEST**
