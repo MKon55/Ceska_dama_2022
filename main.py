@@ -2,6 +2,7 @@
 # Pro pygame => pip install pygame
 
 import pygame
+import os
 
 #Importování modulu ze game
 from game.stat_values import WIDTH, HEIGHT
