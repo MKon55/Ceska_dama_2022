@@ -22,8 +22,6 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dáma")  # Název hry
 
 #Metoda která určit row, col pozice naší myši
-
-
 def get_mouse_pos(pos):
     x, y = pos
     row = y // SQUARE_SIZE
@@ -31,20 +29,14 @@ def get_mouse_pos(pos):
     return row, col
 
 # Start the game with 2 players
-
-
 def start_players():
     main()
 
 # Start the game against ai
-
-
 def start_ai():
     main()
 
 # Start the game from a .csv file
-
-
 def load_game():
     path_to_file = file_picker()
     if path_to_file is None:
@@ -53,8 +45,6 @@ def load_game():
     main(loaded_game)
 
 # Main menu (opens first)
-
-
 def main_menu():
     mytheme = pygame_menu.Theme(background_color=(204, 255, 224),
                                 title_background_color=(25, 200, 25),
@@ -79,8 +69,6 @@ def main_menu():
     menu.mainloop(WIN)
 
 # Window for picking a file to load
-
-
 def file_picker():
     window_surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -115,8 +103,6 @@ def file_picker():
         pygame.display.update()
 
 # Helping function for file_picker()
-
-
 def open_ui_file_dialog(manager):
     file_selection = UIFileDialog(rect=Rect(0, 0, WIDTH, HEIGHT), manager=manager, allow_picking_directories=False, window_title="Vybrat uloženou hru")
     file_selection.cancel_button.set_text("Zpět")
