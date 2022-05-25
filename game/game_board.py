@@ -76,6 +76,27 @@ class Game_board:
                 # topleft = 0,0 (x směrem do prava a y směrem dolu )
                 pygame.draw.rect(win, BOARD_WHITE, (row*SQUARE_SIZE, col * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
+    # Funkce pro kontrolu výhry, ještě není nikde implementovaná -> po dokončení tahu se může spouštět
+    # Kontroluje pouze počet kamenů, nikoliv zda už třeba nejsou možné další tahy, nutno dodělat
+    def winDetection(self):
+        blackStone = 0
+        whiteStone = 0
+        for i in range(ROW):
+            for j in range(COL):
+                #print(self._game_board[i][j])
+                
+                if(isinstance(self._game_board[i][j],Stone)):
+                    if(self._game_board[i][j].color==WHITE):
+                        whiteStone+=1
+                    if(self._game_board[i][j].color==BLACK):
+                        blackStone+=1
+        if(blackStone <= 0):
+            print("Black lost")
+        elif(whiteStone <= 0):
+            print("White lost")
+        else: 
+            print("Noone lost")
+
     @property
     def game_board(self):
         return self._game_board

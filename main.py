@@ -18,6 +18,7 @@ def main():
     game = True
     gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
     board = Game_board()
+    #Game_board.winDetection(board)
 
     loaded_game = File_manager().read_file("savegame1")
     print(loaded_game)
