@@ -4,7 +4,9 @@
 import sys
 import pygame
 import pygame_menu
-from pathlib import Path
+import pygame_gui
+from pygame_gui.windows.ui_file_dialog import UIFileDialog
+from pygame.rect import Rect
 
 #Importování modulu ze game
 from game.stat_values import WIDTH, HEIGHT
@@ -27,7 +29,10 @@ def start_ai():
 
 
 def load_game():
-    loaded_game = File_manager().read_file("savegame1")
+    path_to_file = file_picker()
+    if path_to_file is None:
+        return
+    loaded_game = File_manager().read_file(path_to_file)
     main(loaded_game)
 
 
@@ -55,16 +60,59 @@ def main_menu():  # Main menu (opens first)
     menu.mainloop(WINDOW)
 
 
+def file_picker():
+    window_surface = pygame.display.set_mode((WIDTH, HEIGHT))
+
+    background = pygame.Surface((WIDTH, HEIGHT))
+    background.fill(pygame.Color('#ccffe0'))
+
+    manager = pygame_gui.UIManager((HEIGHT, HEIGHT), "Ceska_dama_2022\\gui_theme.json")
+    clock = pygame.time.Clock()
+
+    file_selection = open_ui_file_dialog(manager)
+
+    while 1:
+        time_delta = clock.tick(60) / 1000.0
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+
+            if event.type == pygame.USEREVENT:
+                if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+                    if event.ui_element == file_selection.ok_button:
+                        return file_selection.current_file_path
+
+                    if event.ui_element == file_selection.cancel_button:
+                        return None
+            manager.process_events(event)
+
+        manager.update(time_delta)
+        window_surface.blit(background, (0, 0))
+        manager.draw_ui(window_surface)
+
+        pygame.display.update()
+
+
+def open_ui_file_dialog(manager):
+    file_selection = UIFileDialog(rect=Rect(0, 0, WIDTH, HEIGHT), manager=manager, allow_picking_directories=False, window_title="Vybrat uloženou hru")
+    file_selection.cancel_button.set_text("Zpět")
+    file_selection.home_button.tool_tip_text = "Domů"
+    file_selection.delete_button.tool_tip_text = "Odstranit"
+    file_selection.refresh_button.tool_tip_text = "Aktualizovat"
+    file_selection.parent_directory_button.tool_tip_text = "O složku výš"
+    return file_selection
+
+
 def main(loaded_game=None):  # Main game loop
     game = True
     gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
     board = Game_board()
 
     if loaded_game is not None:
-        print(loaded_game)
         board.load_board(loaded_game)
 
-    File_manager().save_file(board.game_board, "savegame2")
+    #File_manager().save_file(board.game_board, "savegame2")
 
     while game:
         gaming_time.tick(FPS)
@@ -84,7 +132,6 @@ def main(loaded_game=None):  # Main game loop
     sys.exit()
 
 
-#main()
 main_menu()
 
 #vytvoření "předgui" pro načtení ze souboru .csv nebo začátek nové partie
