@@ -2,15 +2,16 @@
 # Pro pygame => pip install pygame
 
 import pygame
+from game.game_board import Game_board
 
 #Importování modulu ze game
 from game.stat_values import WIDTH, HEIGHT, SQUARE_SIZE
-from game.game_board import Game_board
 from game.file_manager import File_manager
+from game.game_movement import Gameing
 
 FPS = 60
 
-WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dáma")  # Název hry
 
 #Metoda která určit row, col pozice naší myši 
@@ -21,9 +22,10 @@ def get_mouse_pos(pos):
     return row, col
 
 def main():
-    game = True
+    game_runing = True
     gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
-    board = Game_board()
+    #board = Game_board()
+    game = Gameing(WIN)
 
     #Načítání a ukládání ze partie 
     #loaded_game = File_manager().read_file("savegame1")
@@ -32,23 +34,29 @@ def main():
 
     #File_manager().save_file(board.game_board, "savegame2")
 
-    while game:
+    while game_runing:
         gaming_time.tick(FPS)
+
+        #Win => ukončení hry, potom můžeme vylepšit 
+        if  game.game_winner() != None:
+            print("The mission, the nightmare... they are finally... over.")
+            game_runing = False
 
         for event in pygame.event.get():
             # Event pro pygame => ukončení hry (button)
             if event.type == pygame.QUIT:
-                game = False
+                game_runing = False
 
             if event.type == pygame.MOUSEBUTTONUP:  # Pro klikání myší, zjišťuje na co jsme klikly a co můžeme dělat
                 pos = pygame.mouse.get_pos()
                 row, col = get_mouse_pos(pos)
-                stone = board.get_stone(row, col)
+                game.select(row, col)
                 #Testovací jednotka pro kliknuti.pohyb
                 #board.movement(stone, 4, 3)
-
-        board.draw(WINDOW)
-        pygame.display.update()  # Pro update hracího pole když hrajeme hru
+                
+        #board.draw(WINDOW)
+        #pygame.display.update()  # Pro update hracího pole když hrajeme hru
+        game.update()
 
     pygame.quit()  # ukončení window pro hru
 

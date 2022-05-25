@@ -24,7 +24,7 @@ class Stone:
 
     #Metoda co čistě jenom určí že náš hrací kámen jest nyní dáma
     #   Můžeme použít .png obrázek korunky pro tvorbu dámy
-    def queen(self):
+    def make_queen(self):
         self.queen = True
 
     #Metoda vykreslí hrací kámen
@@ -36,7 +36,7 @@ class Stone:
             win.blit(CROWN, (self.x - CROWN.get_width()//2, self.y - CROWN.get_height()//2)) #Blit umožní vykreslení crown na hrací kámen + "matematika" pro vykreslení přímo do prostředí 
             
     #Metoda pro pohyb hracího kamene
-    def movement(self, row, col):
+    def move(self, row, col):
         self.row = row
         self.col = col
         self.calc_pos() #Přepočítání aby byl kámen přesunut na prostředek čtverce 

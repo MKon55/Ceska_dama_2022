@@ -6,7 +6,6 @@ import pygame
 from .stat_values import BOARD_BLACK, BOARD_WHITE, SQUARE_SIZE, ROW, COL, BLACK, WHITE
 from .stone import Stone
 
-
 class Game_board:
     def __init__(self):
         self._game_board = []
@@ -14,7 +13,7 @@ class Game_board:
         self.black_queens = self.white_queens = 0
         self.create_game_board()
 
-    # Metody vytvoří herní plochu
+    # Metoda vytvoří herní plochu
     def create_game_board(self):
         for row in range(ROW):
             self._game_board.append([])  # List pro každou řadu
@@ -59,16 +58,7 @@ class Game_board:
             self._game_board.append([])
             for col in range(COL):
                 self._game_board[row].append(0)
-
-    # Metoda vykreslí hrací kameny a hrací pole => hrací plochu
-    def draw(self, win):
-        self.draw_squares(win)
-        for row in range(ROW):
-            for col in range(COL):
-                piece = self._game_board[row][col]
-                if piece != 0:
-                    piece.draw(win)
-
+            
     # Metoda vykreslí čtverce ve kterých budou hrací kameny
     def draw_squares(self, win):
         win.fill(BOARD_BLACK)
@@ -77,26 +67,168 @@ class Game_board:
             for col in range(row % 2, COL, 2):
                 # topleft = 0,0 (x směrem do prava a y směrem dolu )
                 pygame.draw.rect(win, BOARD_WHITE, (row*SQUARE_SIZE, col * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+
+    # Metoda vykreslí hrací kameny a hrací pole => hrací plochu
+    def draw(self, win):
+        self.draw_squares(win)
+        for row in range(ROW):
+            for col in range(COL):
+                stone = self.game_board[row][col]
+                if stone != 0:
+                    stone.draw(win)
                 
     #Metoda pro pohyb
     #1. pohyb kamene v listu + 2. update 
     def movement(self, stone, row, col):
         # Prohození pozic hodnot; nemusíme vytvářet temp
         self.game_board[stone.row][stone.col], self.game_board[row][col] = self.game_board[row][col], self.game_board[stone.row][stone.col]
-        stone.movement(row, col)
+        stone.move(row, col)
         
         #Kontrola zda jsme na pozici kdy se stone může stát queen + update hodnot self.black_queens a self.white_queens 
-        if row == ROW or row == 0: #Jestliže jsme na pozici 0 nebo 7 tak jsme na konci či začátku hrací plohcy => kámen se stává dámou 
+        if row == ROW - 1 or row == 0: #Jestliže jsme na pozici 0 nebo 7 tak jsme na konci či začátku hrací plohcy => kámen se stává dámou 
             stone.make_queen()
             if stone.color == BLACK:
                 self.black_queens += 1
             else: 
-                self.white_queens += 1
+                self.white_queens += 1               
        
     #Metoda pro stone aby jsme jej mohli předat do movement v main()         
     def get_stone(self, row, col):
         return self.game_board[row][col]
-
+    
+    #Odstranění hracího kamene jesliže byl přeskočen 
+    def remove(self, stones):
+        for stone in stones:
+            self.game_board[stone.row][stone.col] = 0
+            #Pokud byl hrací kámen přeskočen jest odstraněn ze počtu celkových hracích kamenů
+            if stone != 0:
+                if stone.color == WHITE:
+                    self.white_left -= 1
+                else:
+                    self.black_left -= 1
+                    
+    #Metoda vrátí barvu vítěze, prozatím takto jeduduché 
+    def winner(self):
+        if self.white_left <= 0:
+            return BLACK
+        elif self.black_left <= 0:
+            return WHITE
+        
+        return None #Pokud nikdo nevyhraje tak None
+ 
+#Algoritmus který vezme hrací kámen a pro daný hrací kámen určí všechny možné správné pohyby které může vykonat 
+    #Musíme zkontrolovat zda se jedná ho černý nebo bílý hrací kámen 
+    # - Jestliže je to černý kámen tak se můžeme hýbat pouze směrem dolů 
+    # - Jestliže to je bílí kámen tak se můžeme hýbat pouze směrem nahoru 
+    #Jestliže na diaogáne je protihráčům kámen => můžeme ho přeskočit? => jak pro levý či prahý pohyb 
+    # - Kontrola dále po diagonále zda můžeme přeskočit 
+    #Doublejump rule => Jestliže jsme přeskočili kontrola zda můžeme po diagonále znovu přeskočit
+    
+    def get_correct_moves(self, stone):
+        moves = {} #ukládát pozice (row, col)
+        left = stone.col - 1
+        right = stone.col + 1
+        row = stone.row
+        
+        #Kontrola barvy + PROZATÍM nechávám dámu ve stejném pohybu musíme ještě implementovat specifický pohyb dámy => pohyb po celé diagonále + dáma má přednost!!
+        if stone.color == WHITE or stone.queen:
+            #Jsme White pohybujeme se nahoru, Jak "hodně nahoru se koukáme"
+            moves.update(self._movement_left(row -1, max(row-3, -1), -1, stone.color, left))
+            moves.update(self._movement_right(row -1, max(row-3, -1), -1, stone.color, right))
+            
+        if stone.color == BLACK or stone.queen:
+            #Nyní se pohybujeme dolů tudíž +1, min()
+            moves.update(self._movement_left(row +1, min(row+3, ROW), 1, stone.color, left))
+            moves.update(self._movement_right(row +1, min(row+3, ROW), 1, stone.color, right))
+            
+        return moves
+            
+    #Pohyb po levé diagonále     
+    def _movement_left(self, start, stop, step, color, left, skipped=[]): #step určí jakým směrem se pohybujeme, skip určí zda jsme nějakou přeskočili
+        moves = {}
+        last = []
+        for r in range(start, stop, step):
+            if left < 0: #Jestliže koumáme již mimo hrací pole 
+                break
+            
+            #Traversování do levé strany
+            current = self.game_board[r][left]
+            #Pokud == 0 tak jsme našli prazdné pole do kterého se můžeme hýbnout 
+            if current == 0:
+                if skipped and not last:
+                    break #Jestliže jsme přeskočili a již nemůžeme nic jiného přeskočit tak už se nemůžeme hýbat
+                elif skipped:
+                    moves[(r, left)] = last + skipped #Toto určuje potom co jsme přeskočili jaké kameny máme odstranit ze hry
+                #Pukud splněnuje předchozí tak jej můžeme přeskočit 
+                else:
+                    moves[(r, left)] = last
+                 
+                #Kontrola zda můžeme double or triple
+                if last:
+                    if step == -1:
+                        row = max(r-3,0)
+                    else:
+                        row = min(r+3, ROW)
+                    
+                    #Rekalkulace jestliže jsme skočili a nyní můžeme double or triple
+                    moves.update(self._movement_left(r+step, row, step, color, left-1, skipped = last))
+                    moves.update(self._movement_right(r+step, row, step, color, left+1, skipped = last))
+                break #Pro jistotu aby byl pohyb zastaven po double or triple 
+                    
+            #Pokud poli je hrací kámen který je stejné barvy tak se tam nemůžeme hýbnout 
+            elif current.color == color:
+                break
+            #Pokud to není naší barvy tak je to protihráčovo kámen a můžeme se hýbnout S TÍM  že předpokládáme že za ní je prázdné pole 
+            else:
+                last = [current] 
+                    
+            left -= 1
+            
+        return moves
+    
+    #Pohyb po pravé diagonále 
+    def _movement_right(self, start, stop, step, color, right, skipped=[]):
+        moves = {}
+        last = []
+        for r in range(start, stop, step):
+            if right >= COL: #Jestliže koumáme již mimo hrací pole 
+                break
+            
+            #Traversování do pravé strany
+            current_move = self.game_board[r][right]
+            #Pokud == 0 tak jsme našli prazdné pole do kterého se můžeme hýbnout 
+            if current_move == 0:
+                if skipped and not last:
+                    break #Jestliže jsme přeskočili a již nemůžeme nic jiného přeskočit tak už se nemůžeme hýbat
+                elif skipped:
+                    moves[(r, right)] = last + skipped #Toto určuje potom co jsme přeskočili jaké kameny máme odstranit ze hry
+                #Pukud splněnuje předchozí tak jej můžeme přeskočit 
+                else:
+                    moves[(r, right)] = last
+                 
+                #Kontrola zda můžeme double or triple
+                if last:
+                    if step == -1:
+                        row = max(r-3,0)
+                    else:
+                        row = min(r+3, ROW)
+                    
+                    #Rekalkulace jestliže jsme skočili a nyní můžeme double or triple
+                    moves.update(self._movement_left(r+step, row, step, color, right-1, skipped = last))
+                    moves.update(self._movement_right(r+step, row, step, color, right+1, skipped = last))
+                break #Pro jistotu aby byl pohyb zastaven po double or triple 
+                    
+            #Pokud poli je hrací kámen který je stejné barvy tak se tam nemůžeme hýbnout 
+            elif current_move.color == color:
+                break
+            #Pokud to není naší barvy tak je to protihráčovo kámen a můžeme se hýbnout S TÍM  že předpokládáme že za ní je prázdné pole 
+            else:
+                last = [current_move] 
+                    
+            right += 1
+            
+        return moves
+            
     @property
     def game_board(self):
         return self._game_board
