@@ -8,6 +8,7 @@ import pygame_gui
 from pygame_gui.windows.ui_file_dialog import UIFileDialog
 from pygame.rect import Rect
 from game.game_board import Game_board
+from config.localconfig import PATH
 
 #Importování modulu ze game
 from game.stat_values import WIDTH, HEIGHT, SQUARE_SIZE
@@ -86,7 +87,7 @@ def file_picker():
     background = pygame.Surface((WIDTH, HEIGHT))
     background.fill(pygame.Color('#ccffe0'))
 
-    manager = pygame_gui.UIManager((HEIGHT, HEIGHT), "Ceska_dama_2022\\gui_theme.json")
+    manager = pygame_gui.UIManager((HEIGHT, HEIGHT), PATH + "gui_theme.json")
     clock = pygame.time.Clock()
 
     file_selection = open_ui_file_dialog(manager)
