@@ -9,9 +9,9 @@ class File_manager:
     """Reads and Writes to .csv files"""
 
     @staticmethod
-    def read_file(filename):
-        base_path = Path(__file__).parent
-        file_path = (base_path / f"../{filename}.csv").resolve()
+    def read_file(path_to_file):
+        #base_path = Path(__file__).parent
+        file_path = path_to_file.resolve()
 
         board = []
         occupied_tiles = []
