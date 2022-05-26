@@ -1,3 +1,25 @@
+"""
+Hlavní část programu
+
+Metody
+------
+get_mouse_pos()
+    Určí row, col pozice naší myši
+start_players()
+    Začne hru PvP
+start_ai()
+    Začne hru PvAi
+load_game()
+    Načte hru z .csv file, dle výběru z file_pickeru
+main_menu()
+    Tvorba main menu
+file_picker()
+    Tvorba rozhraní pro výběr souboru k načtení savu (prohlížeč)
+open_ui_file_dialog(manager)
+    Tvorba možných akcí pro soubory ve file_pickeru(pomocná fce)
+main(loaded_game=None)
+
+"""
 # Hlavní část programu
 # Pro pygame => pip install pygame
 
@@ -22,23 +44,35 @@ pygame.init()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dáma")  # Název hry
 
-#Metoda která určit row, col pozice naší myši
+
 def get_mouse_pos(pos):
+    """
+    Určí row, col pozice naší myši
+    """
     x, y = pos
     row = y // SQUARE_SIZE
     col = x // SQUARE_SIZE
     return row, col
 
-# Start the game with 2 players
+
 def start_players():
+    """
+    Začne hru PvP
+    """
     main()
 
-# Start the game against ai
+
 def start_ai():
+    """
+    Začne hru PvAi
+    """
     main()
 
-# Start the game from a .csv file
+
 def load_game():
+    """
+    Načte hru z .csv file, dle výběru z file_pickeru
+    """
     path_to_file = file_picker()
     if path_to_file is None:
         return
@@ -47,6 +81,9 @@ def load_game():
 
 # Main menu (opens first)
 def main_menu():
+    """
+    Tvorba main menu
+    """
     mytheme = pygame_menu.Theme(background_color=(204, 255, 224),
                                 title_background_color=(25, 200, 25),
                                 title_font_shadow=False,
@@ -71,6 +108,9 @@ def main_menu():
 
 # Window for picking a file to load
 def file_picker():
+    """
+    Tvorba rozhraní pro výběr souboru k načtení savu (prohlížeč)
+    """
     window_surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
     background = pygame.Surface((WIDTH, HEIGHT))
@@ -105,6 +145,10 @@ def file_picker():
 
 # Helping function for file_picker()
 def open_ui_file_dialog(manager):
+    """
+    Tvorba možných akcí pro soubory ve file_pickeru
+    Pomocná funkce
+    """
     file_selection = UIFileDialog(rect=Rect(0, 0, WIDTH, HEIGHT), manager=manager, allow_picking_directories=False, window_title="Vybrat uloženou hru")
     file_selection.cancel_button.set_text("Zpět")
     file_selection.home_button.tool_tip_text = "Domů"

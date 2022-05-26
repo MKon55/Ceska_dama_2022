@@ -1,5 +1,7 @@
-#Neměné hodnoty (musíme importovat jako), Static Values
-#Usnadnění práce pro rozhraní hry, samozžejmě že takto nemusíme ale příjde mi to přehlednější
+"""
+Neměnné hodnoty, importujeme je jako stat_values
+Usnadnění práce pro rozhraní hry, lepší přehled o používaných hodnotách
+"""
 
 import pygame
 from config.localconfig import PATH
