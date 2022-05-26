@@ -21,4 +21,4 @@ BOARD_WHITE = (232, 208, 170)
 BOARD_BLACK = (166, 125, 93)
 
 #Načtení crown from assets + transform pro správnou velikost
-CROWN = pygame.transform.scale(pygame.image.load(PATH + 'assets/crown3.png'), (40, 30))
+CROWN = pygame.transform.scale(pygame.image.load(PATH + 'assets/crown.png'), (40, 30))
