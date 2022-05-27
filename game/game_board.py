@@ -78,21 +78,21 @@ class Game_board:
 
     # Funkce pro kontrolu výhry, ještě není nikde implementovaná -> po dokončení tahu se může spouštět
     # Kontroluje pouze počet kamenů, nikoliv zda už třeba nejsou možné další tahy, nutno dodělat
-    def winDetection(self):
-        blackStone = 0
-        whiteStone = 0
+    def win_detection(self):
+        black_stone = 0
+        white_stone = 0
         for i in range(ROW):
             for j in range(COL):
                 #print(self._game_board[i][j])
                 
                 if(isinstance(self._game_board[i][j],Stone)):
                     if(self._game_board[i][j].color==WHITE):
-                        whiteStone+=1
+                        white_stone+=1
                     if(self._game_board[i][j].color==BLACK):
-                        blackStone+=1
-        if(blackStone <= 0):
+                        black_stone+=1
+        if(black_stone <= 0):
             print("Black lost")
-        elif(whiteStone <= 0):
+        elif(white_stone <= 0):
             print("White lost")
         else: 
             print("Noone lost")
