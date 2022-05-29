@@ -14,21 +14,21 @@ class Stone:
         self.queen = queen  # pro vytvoření hracího kamene dámy, kontrola zda jsem dáma či ne
         self.x = 0  # x pro col
         self.y = 0  # y pro row
-        self.calc_pos()
+        self.CalcPos()
 
     #Metoda co určí pozici ve hracím čtverci pro vytvoření hracího kamene
     #   Prostředek našeho místa pro hrací kámen, pro jeho správné vykreslení (Prostředek čtverce)
-    def calc_pos(self):
+    def CalcPos(self):
         self.x = SQUARE_SIZE * self.col + SQUARE_SIZE // 2
         self.y = SQUARE_SIZE * self.row + SQUARE_SIZE // 2
 
     #Metoda co čistě jenom určí že náš hrací kámen jest nyní dáma
     #   Můžeme použít .png obrázek korunky pro tvorbu dámy
-    def make_queen(self):
+    def MakeQueen(self):
         self.queen = True
 
     #Metoda vykreslí hrací kámen
-    def draw(self, win):
+    def Draw(self, win):
         radius = SQUARE_SIZE//2 - self.PADDING
         pygame.draw.circle(win, self.color, (self.x, self.y), radius)
         #Cyklus pro vykreslení queen piece
@@ -36,10 +36,10 @@ class Stone:
             win.blit(CROWN, (self.x - CROWN.get_width()//2, self.y - CROWN.get_height()//2)) #Blit umožní vykreslení crown na hrací kámen + "matematika" pro vykreslení přímo do prostředí 
             
     #Metoda pro pohyb hracího kamene
-    def move(self, row, col):
+    def Move(self, row, col):
         self.row = row
         self.col = col
-        self.calc_pos() #Přepočítání aby byl kámen přesunut na prostředek čtverce 
+        self.CalcPos() #Přepočítání aby byl kámen přesunut na prostředek čtverce 
 
 #Potřeba stále implementovat pohyb hracího kamene (White hráč vždycky začíná jako první pokud není načteno ze partie v .csv)
 #   Implementace buď ve hrací_kamenu nebo hraci_plocha nebo vlastí specifcký soubor na pohyb
