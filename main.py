@@ -9,6 +9,7 @@ from pygame_gui.windows.ui_file_dialog import UIFileDialog
 from pygame.rect import Rect
 from game.game_board import Game_board
 from config.localconfig import PATH
+from screeninfo import get_monitors
 
 #Importování modulu ze game
 from game.stat_values import WIDTH, HEIGHT, SQUARE_SIZE
@@ -16,6 +17,17 @@ from game.file_manager import File_manager
 from game.game_movement import Gameing
 
 FPS = 60
+
+# Dá nám velikost obrazovky a nastaví ji
+def GetAndSetScreenSize():
+    global HEIGHT
+    global WIDTH
+    for m in get_monitors():
+        if(m.is_primary == True):
+            WIDTH = m.width/2
+            HEIGHT = WIDTH
+
+#GetAndSetScreenSize()
 
 pygame.init()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
