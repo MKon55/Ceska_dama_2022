@@ -23,6 +23,8 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dáma")  # Název hry
 
 #Metoda která určit row, col pozice naší myši
+
+
 def GetMousePos(pos):
     x, y = pos
     row = y // SQUARE_SIZE
@@ -30,22 +32,30 @@ def GetMousePos(pos):
     return row, col
 
 # Start the game with 2 players
+
+
 def StartPlayers():
     Main()
 
 # Start the game against ai
+
+
 def StartAi():
     Main()
 
 # Start the game from a .csv file
+
+
 def LoadGame():
-    PathToFile = FilePicker()
-    if PathToFile is None:
+    pathToFile = FilePicker()
+    if pathToFile is None:
         return
-    LoadedGame = FileManager().ReadFile(PathToFile)
-    Main(LoadedGame)
+    loadedGame, turn = FileManager().ReadFile(pathToFile)
+    Main(loadedGame, turn)
 
 # Main menu (opens first)
+
+
 def MainMenu():
     MyTheme = pygame_menu.Theme(background_color=(204, 255, 224),
                                 title_background_color=(25, 200, 25),
@@ -70,6 +80,8 @@ def MainMenu():
     menu.mainloop(WIN)
 
 # Window for picking a file to load
+
+
 def FilePicker():
     window_surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -104,6 +116,8 @@ def FilePicker():
         pygame.display.update()
 
 # Helping function for FilePicker()
+
+
 def OpenUiFileDialog(manager):
     file_selection = UIFileDialog(rect=Rect(0, 0, WIDTH, HEIGHT), manager=manager, allow_picking_directories=False, window_title="Vybrat uloženou hru")
     file_selection.cancel_button.set_text("Zpět")
@@ -114,16 +128,17 @@ def OpenUiFileDialog(manager):
     return file_selection
 
 
-def Main(LoadedGame=None):  # Main game loop
+def Main(loadedGame=None, turn=None):  # Main game loop
     game_running = True
     gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
     game = Gameing(WIN)
 
     # Load a game if we get a board
-    if LoadedGame is not None:
-        game.board.LoadBoard(LoadedGame)
+    if loadedGame is not None:
+        game.board.LoadBoard(loadedGame)
+        game.SetTurn(turn)
 
-    #File_manager().save_file(board.game_board, "savegame2")
+    FileManager.SaveFile(game.board.GameBoard, "savegame2")
 
     while game_running:
         gaming_time.tick(FPS)

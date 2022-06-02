@@ -2,7 +2,8 @@ import csv
 import re
 from pathlib import Path
 from .game_board import GameBoard
-from .stat_values import ROW, COL, BLACK, WHITE
+from .game_movement import Gameing
+from .stat_values import WHITE, BLACK, WHITE_CHAR, BLACK_CHAR, WHITE_QUEEN_CHAR, BLACK_QUEEN_CHAR, DEFAULT_COLOR_TURN, WHITE_TURN_CHAR, BLACK_TURN_CHAR
 
 
 class FileManager:
@@ -10,16 +11,23 @@ class FileManager:
 
     @staticmethod
     def ReadFile(path_to_file):
-        #base_path = Path(__file__).parent
         file_path = path_to_file.resolve()
 
         board = []
+        turn = DEFAULT_COLOR_TURN
         occupied_tiles = []
 
         with open(file_path) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
 
+            firstRow = True
             for row in csv_reader:
+                # Check if the first row has info about who's turn it is. If not, assume WHITE turn
+                if firstRow:
+                    if FileManager.IsRowAboutPlayerTurn(row):  # First row has info about who's turn it is
+                        turn = FileManager.GetTurnColorFromText(row[0])
+                        continue
+                    firstRow = False
                 row = list(map(FileManager._RemoveSpaces, row))  # Remove all spaces
                 row = list(map(lambda x: x.lower(), row))  # Make lowercase
                 if FileManager.IsEmptyRow(row):  # Skip empty rows
@@ -35,11 +43,15 @@ class FileManager:
 
                     board.append(row)
                     occupied_tiles.append(row[0])
-        return board
+        return board, turn
 
     @staticmethod
     def SaveFile(board, filename):
         save_string = ""
+
+        # Who's turn is it
+        save_string += WHITE_CHAR if Gameing.turn == WHITE else BLACK_CHAR
+        save_string += "\n"
 
         for row in board:
             for stone in row:
@@ -57,9 +69,9 @@ class FileManager:
     def _FormatOutput(row, col, color, queen):
         color_symbol = ""
         if color == BLACK:
-            color_symbol = "b"
+            color_symbol = BLACK_CHAR
         elif color == WHITE:
-            color_symbol = "w"
+            color_symbol = WHITE_CHAR
         return f"{GameBoard.CoordinatesToNotation(row, col)},{color_symbol if not queen else color_symbol * 2}"
 
     @staticmethod
@@ -69,11 +81,26 @@ class FileManager:
             raise FileManagerException(f"Invalid number of fields in a row. (Expected 2, found {len(row)})")
 
         first_field = re.match("[a-h]{1}[1-8]{1}", row[0])
-        second_field = (row[1] == 'b') or (row[1] == 'bb') or (row[1] == 'w') or (row[1] == 'ww')
+        second_field = (row[1] == WHITE_CHAR) or (row[1] == WHITE_QUEEN_CHAR) or (row[1] == BLACK_CHAR) or (row[1] == BLACK_QUEEN_CHAR)
         if first_field and second_field:
             return
         else:
             raise FileManagerException(f"Invalid format: \"{row}\"")
+
+    @staticmethod
+    def IsRowAboutPlayerTurn(row):
+        # Check if the row is about who's turn it is
+        if len(row) == 1:
+            return row[0] == WHITE_TURN_CHAR or row[0] == BLACK_TURN_CHAR
+
+    @staticmethod
+    def GetTurnColorFromText(text):
+        if text == WHITE_TURN_CHAR:
+            return WHITE
+        if text == BLACK_TURN_CHAR:
+            return BLACK
+        else:
+            return DEFAULT_COLOR_TURN
 
     @staticmethod
     def IsEmptyRow(row):  # Empty row or a row containing just an empty string
