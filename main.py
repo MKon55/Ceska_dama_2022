@@ -18,17 +18,6 @@ from game.game_movement import Gameing
 
 FPS = 60
 
-# Dá nám velikost obrazovky a nastaví ji
-def GetAndSetScreenSize():
-    global HEIGHT
-    global WIDTH
-    for m in get_monitors():
-        if(m.is_primary == True):
-            WIDTH = m.width/2
-            HEIGHT = WIDTH
-
-#GetAndSetScreenSize()
-
 pygame.init()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dáma")  # Název hry
