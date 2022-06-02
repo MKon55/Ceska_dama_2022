@@ -12,7 +12,7 @@ def GetAndSetScreenSize():
     global WIDTH
     for m in get_monitors():
         if(m.is_primary == True):
-            WIDTH = m.width/2
+            WIDTH = m.width//2
             HEIGHT = WIDTH
 GetAndSetScreenSize()
 
