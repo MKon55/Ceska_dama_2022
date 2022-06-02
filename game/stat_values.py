@@ -3,9 +3,20 @@
 
 import pygame
 from config.localconfig import PATH
+from screeninfo import get_monitors
+WIDTH, HEIGHT = 0, 0
+
+#Tato metoda nastaví dynamickou velikost plochy
+def GetAndSetScreenSize():
+    global HEIGHT
+    global WIDTH
+    for m in get_monitors():
+        if(m.is_primary == True):
+            WIDTH = m.width/2
+            HEIGHT = WIDTH
+GetAndSetScreenSize()
 
 #Hodnoty
-WIDTH, HEIGHT = 800, 800  # 800 x 800  hrací plocha
 ROW, COL = 8, 8  # standartní
 SQUARE_SIZE = WIDTH//ROW  # Velikost jednoho čtverce pro hrací kámen
 
@@ -22,3 +33,4 @@ BOARD_BLACK = (166, 125, 93)
 
 #Načtení crown from assets + transform pro správnou velikost
 CROWN = pygame.transform.scale(pygame.image.load(PATH + 'assets/crown3.png'), (40, 30))
+
