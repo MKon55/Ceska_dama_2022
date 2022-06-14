@@ -8,10 +8,9 @@ import pygame_menu
 import pygame_gui
 from pygame_gui.windows.ui_file_dialog import UIFileDialog
 from pygame.rect import Rect
-from game.game_board import GameBoard
 from config.localconfig import PATH
 
-#Importování modulu ze game
+# Importování modulu ze game
 from game.stat_values import WIDTH, HEIGHT, SQUARE_SIZE
 from game.file_manager import FileManager
 from game.game_movement import Gameing
@@ -22,30 +21,26 @@ pygame.init()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dáma")  # Název hry
 
-#Metoda která určit row, col pozice naší myši
 
-
+# Metoda která určit row, col pozice naší myši
 def GetMousePos(pos):
     x, y = pos
     row = y // SQUARE_SIZE
     col = x // SQUARE_SIZE
     return row, col
 
+
 # Start the game with 2 players
-
-
 def StartPlayers():
     Main()
 
+
 # Start the game against ai
-
-
 def StartAi():
     Main()
 
+
 # Start the game from a .csv file
-
-
 def LoadGame():
     pathToFile = FilePicker()
     if pathToFile is None:
@@ -53,9 +48,8 @@ def LoadGame():
     loadedGame, turn = FileManager().ReadFile(pathToFile)
     Main(loadedGame, turn)
 
+
 # Main menu (opens first)
-
-
 def MainMenu():
     MyTheme = pygame_menu.Theme(background_color=(204, 255, 224),
                                 title_background_color=(25, 200, 25),
@@ -79,9 +73,8 @@ def MainMenu():
 
     menu.mainloop(WIN)
 
+
 # Window for picking a file to load
-
-
 def FilePicker():
     window_surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -115,9 +108,8 @@ def FilePicker():
 
         pygame.display.update()
 
+
 # Helping function for FilePicker()
-
-
 def OpenUiFileDialog(manager):
     file_selection = UIFileDialog(rect=Rect(0, 0, WIDTH, HEIGHT), manager=manager, allow_picking_directories=False, window_title="Vybrat uloženou hru")
     file_selection.cancel_button.set_text("Zpět")

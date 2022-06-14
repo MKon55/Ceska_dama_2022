@@ -31,6 +31,3 @@ BOARD_BLACK = (166, 125, 93)
 
 #Načtení crown from assets + transform pro správnou velikost
 CROWN = pygame.transform.scale(pygame.image.load(PATH + 'assets/crown.png'), (40, 40))
-
-# default turn
-# color characters
