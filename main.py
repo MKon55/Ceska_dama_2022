@@ -1,6 +1,5 @@
 # Hlavní část programu
 # Pro pygame => pip install pygame
-
 import sys
 import pygame
 
@@ -50,6 +49,8 @@ def LoadGame():
 
 
 # Main menu (opens first)
+
+
 def MainMenu():
     MyTheme = pygame_menu.Theme(background_color=(204, 255, 224),
                                 title_background_color=(25, 200, 25),
