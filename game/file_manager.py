@@ -4,6 +4,8 @@ from pathlib import Path
 from .game_board import GameBoard
 from .game_movement import Gameing
 from .stat_values import WHITE, BLACK, WHITE_CHAR, BLACK_CHAR, WHITE_QUEEN_CHAR, BLACK_QUEEN_CHAR, DEFAULT_COLOR_TURN, WHITE_TURN_CHAR, BLACK_TURN_CHAR
+from .piece_normal import PieceNormal
+from .piece_queen import PieceQueen
 
 
 class FileManager:
@@ -47,6 +49,7 @@ class FileManager:
 
     @staticmethod
     def SaveFile(board, filename):
+        return
         save_string = ""
 
         # Who's turn is it
@@ -57,7 +60,8 @@ class FileManager:
             for stone in row:
                 if stone == 0:  # Empty square
                     continue
-                save_string += FileManager._FormatOutput(stone.row, stone.col, stone.color, stone.queen) + "\n"
+                isQueen = isinstance(stone, PieceQueen)
+                save_string += FileManager._FormatOutput(stone.row, stone.col, stone.color, isQueen) + "\n"
 
         base_path = Path(__file__).parent
         file_path = (base_path / f"../{filename}.csv").resolve()

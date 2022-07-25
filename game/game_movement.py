@@ -6,7 +6,6 @@
 
 import pygame
 
-from game.stone import Stone
 from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN
 from game.game_board import GameBoard
 
