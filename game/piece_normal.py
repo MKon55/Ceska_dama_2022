@@ -4,6 +4,7 @@ from .stat_values import SQUARE_SIZE
 
 
 class PieceNormal(GamePiece):
+
     def __init__(self, row, col, color):
         super().__init__(row, col, color)
 

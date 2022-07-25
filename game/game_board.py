@@ -4,7 +4,6 @@
 import pygame
 # musí být . jinak neví že .py je ve stejné složce
 from .stat_values import BOARD_BLACK, BOARD_WHITE, SQUARE_SIZE, ROW, COL, BLACK, WHITE
-from .stone import Stone
 from .piece_normal import PieceNormal
 from .piece_queen import PieceQueen
 
@@ -89,7 +88,6 @@ class GameBoard:
 
         #Kontrola zda jsme na pozici kdy se stone může stát queen + update hodnot self.black_queens a self.white_queens
         if row == ROW - 1 or row == 0:  # Jestliže jsme na pozici 0 nebo 7 tak jsme na konci či začátku hrací plohcy => kámen se stává dámou
-            # stone.MakeQueen()
             queen = PieceQueen.fromPiece(stone)
             self.GameBoard[queen.row][queen.col] = queen
             if queen.color == BLACK:
