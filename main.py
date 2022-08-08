@@ -10,7 +10,8 @@ from pygame.rect import Rect
 from config.localconfig import PATH
 
 # Importování modulu ze game
-from game.stat_values import WIDTH, HEIGHT, SQUARE_SIZE
+from game.screen_manager import WIDTH, HEIGHT
+from game.stat_values import SQUARE_SIZE
 from game.file_manager import FileManager
 from game.game_movement import Gameing
 
@@ -49,8 +50,6 @@ def LoadGame():
 
 
 # Main menu (opens first)
-
-
 def MainMenu():
     MyTheme = pygame_menu.Theme(background_color=(204, 255, 224),
                                 title_background_color=(25, 200, 25),
@@ -121,7 +120,8 @@ def OpenUiFileDialog(manager):
     return file_selection
 
 
-def Main(loadedGame=None, turn=None):  # Main game loop
+# Main game loop
+def Main(loadedGame=None, turn=None):
     game_running = True
     gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
     game = Gameing(WIN)
