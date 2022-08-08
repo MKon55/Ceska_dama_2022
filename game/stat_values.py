@@ -2,6 +2,8 @@
 # Usnadnění práce pro rozhraní hry, samozžejmě že takto nemusíme ale příjde mi to přehlednější
 
 import pygame
+import pygame_menu
+
 from config.localconfig import PATH
 from game.screen_manager import WIDTH, HEIGHT
 
@@ -31,3 +33,18 @@ BOARD_BLACK = (166, 125, 93)
 
 # Načtení crown from assets + transform pro správnou velikost
 CROWN = pygame.transform.scale(pygame.image.load(PATH + 'assets/crown.png'), (40, 40))
+
+# Main menu Theme
+MENUTHEME = pygame_menu.Theme(
+    background_color=(204, 255, 224),
+    title_background_color=(25, 200, 25),
+    title_font_shadow=False,
+    title_bar_style=pygame_menu.widgets.MENUBAR_STYLE_NONE,
+    title_font_color=(14, 14, 14),
+    title_font_size=150,
+    title_offset=(WIDTH / 2 - 200, 50),
+    widget_padding=25,
+    title_font=pygame_menu.font.FONT_OPEN_SANS_LIGHT,
+    widget_font=pygame_menu.font.FONT_OPEN_SANS_LIGHT,
+    selection_color=(15, 200, 15)
+)
