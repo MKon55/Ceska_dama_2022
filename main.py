@@ -7,12 +7,11 @@ import pygame_menu
 import pygame_gui
 from pygame_gui.windows.ui_file_dialog import UIFileDialog
 from pygame.rect import Rect
-from game.game_board import Game_board
 from config.localconfig import PATH
-from screeninfo import get_monitors
 
-#Importování modulu ze game
-from game.stat_values import WIDTH, HEIGHT, SQUARE_SIZE
+# Importování modulu ze game
+from game.screen_manager import WIDTH, HEIGHT
+from game.stat_values import SQUARE_SIZE
 from game.file_manager import File_manager
 from game.game_movement import Gameing
 
@@ -22,7 +21,7 @@ pygame.init()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dáma")  # Název hry
 
-#Metoda která určit row, col pozice naší myši
+# Metoda která určit row, col pozice naší myši
 def get_mouse_pos(pos):
     x, y = pos
     row = y // SQUARE_SIZE
