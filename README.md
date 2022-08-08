@@ -6,6 +6,7 @@ Seminární práce - Česká dáma APR2
 - pygame
 - pygame-menu
 - pygame-gui
+- screeninfo
 
 Zadání společné seminární práce KI/(K)APR2 2022
 **základní zadání**
