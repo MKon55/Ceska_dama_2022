@@ -7,7 +7,11 @@
 import pygame
 
 from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN
+from game.screen_manager import WIDTH, HEIGHT
 from game.game_board import GameBoard
+from game.button import Button
+
+button = Button(WIDTH, 50, "Button")
 
 
 class Gameing:
@@ -18,9 +22,11 @@ class Gameing:
         self.win = win
 
      #Update display, nyní jej nemusíme mít ve main.py
-    def Update(self):
+    def Update(self, mouse_pos):
         self.board.Draw(self.win)
+        button.hover(mouse_pos)
         self.DrawCorrectMoves(self.correct_moves)
+        button.draw(self.win)
         pygame.display.update()
 
     def _StartCall(self):
@@ -37,7 +43,9 @@ class Gameing:
        self._StartCall()
 
     #Metoda pro vyběr hracího kamene -> určí row a col -> hýbne s hracím kamenem dle našeho výběru
-    def Select(self, row, col):
+    def Select(self, row, col, pos):
+        button.click(pos)
+
         if self.selected_stone:
             result = self._Move(row, col)
             #Jestliže náš pohyb není validní tak pohyb nebude proveden a znovu zavoláme metodu Select

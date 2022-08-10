@@ -5,7 +5,7 @@ import pygame
 import pygame_menu
 
 from config.localconfig import PATH
-from game.screen_manager import WIDTH, HEIGHT
+from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
 
 # Hodnoty
 ROW, COL = 8, 8  # standartní
@@ -42,7 +42,8 @@ MENUTHEME = pygame_menu.Theme(
     title_bar_style=pygame_menu.widgets.MENUBAR_STYLE_NONE,
     title_font_color=(14, 14, 14),
     title_font_size=150,
-    title_offset=(WIDTH / 2 - 200, 50),
+    title_offset=(WINDOW_WIDTH / 2 - 200, 50),
+    # title_offset=(WIDTH / 2, 0),
     widget_padding=25,
     title_font=pygame_menu.font.FONT_OPEN_SANS_LIGHT,
     widget_font=pygame_menu.font.FONT_OPEN_SANS_LIGHT,
