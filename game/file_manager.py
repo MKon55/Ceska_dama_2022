@@ -49,7 +49,6 @@ class FileManager:
 
     @staticmethod
     def SaveFile(board, filename):
-        return
         save_string = ""
 
         # Who's turn is it
@@ -64,10 +63,10 @@ class FileManager:
                 save_string += FileManager._FormatOutput(stone.row, stone.col, stone.color, isQueen) + "\n"
 
         base_path = Path(__file__).parent
-        file_path = (base_path / f"../{filename}.csv").resolve()
+        file_path = (base_path / f"../saves/{filename}.csv").resolve()
         with open(file_path, 'w') as file:
             file.write(save_string)
-        print(f"Saving to {file_path} as:\n{save_string}")
+        print(f"Saving to {file_path}")
 
     @staticmethod
     def _FormatOutput(row, col, color, queen):

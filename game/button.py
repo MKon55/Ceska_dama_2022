@@ -24,12 +24,13 @@ class Button():
         pygame.draw.rect(screen, "black", self.rect)
         screen.blit(self.text_render, self.rect)
 
-    def click(self, position):
+    def isMouseInside(self, position):
         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
-            print("Button Press!")
+            return True
+        return False
 
     def hover(self, position):
-        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+        if self.isMouseInside(position):
             self.text_render = main_font.render(self.text, True, "green")
         else:
             self.text_render = main_font.render(self.text, True, "white")

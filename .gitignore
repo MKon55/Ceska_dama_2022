@@ -3,3 +3,4 @@ __pycache/
 game/__pycache__/
 game/__pycache__/*
 config/
+*.csv

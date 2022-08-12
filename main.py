@@ -69,8 +69,6 @@ def Main(loadedGame=None, turn=None):
         game.board.LoadBoard(loadedGame)
         game.SetTurn(turn)
 
-    FileManager.SaveFile(game.board.GameBoard, "savegame2")
-
     while game_running:
         gaming_time.tick(FPS)
 

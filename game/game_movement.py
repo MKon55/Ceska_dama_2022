@@ -5,13 +5,13 @@
 #Musíme potom ještě implementovat AI pro samotné hraní hry
 
 import pygame
+from datetime import datetime
 
 from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN
 from game.screen_manager import WIDTH, HEIGHT
 from game.game_board import GameBoard
 from game.button import Button
-
-button = Button(WIDTH, 50, "Button")
+# from game.file_manager import FileManager
 
 
 class Gameing:
@@ -20,13 +20,14 @@ class Gameing:
     def __init__(self, win):
         self._StartCall()
         self.win = win
+        self.saveBtn = Button(WIDTH, 50, "Uložit Hru")
 
      #Update display, nyní jej nemusíme mít ve main.py
     def Update(self, mouse_pos):
         self.board.Draw(self.win)
-        button.hover(mouse_pos)
+        self.saveBtn.hover(mouse_pos)
         self.DrawCorrectMoves(self.correct_moves)
-        button.draw(self.win)
+        self.saveBtn.draw(self.win)
         pygame.display.update()
 
     def _StartCall(self):
@@ -44,14 +45,21 @@ class Gameing:
 
     #Metoda pro vyběr hracího kamene -> určí row a col -> hýbne s hracím kamenem dle našeho výběru
     def Select(self, row, col, pos):
-        button.click(pos)
+        # Check if the click happened on a button
+        if self.saveBtn.isMouseInside(pos):
+            from game.file_manager import FileManager
+            stamp = "dama-save-" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            FileManager.SaveFile(self.board.GameBoard, stamp)
+
+        if self._IsOutsideOfGameboard(pos):
+            return False
 
         if self.selected_stone:
             result = self._Move(row, col)
             #Jestliže náš pohyb není validní tak pohyb nebude proveden a znovu zavoláme metodu Select
             if not result:
                 self.selected_stone = None
-                self.Select(row, col)
+                self.Select(row, col, pos)
 
         stone = self.board.GetStone(row, col)
         #Jestliže hrací kámen který jsme vybrali existuje a vybrali jsme SVOJI barvu
@@ -61,6 +69,10 @@ class Gameing:
             return True  # Výběr a pohyb je správný -> vrátíme True
 
         return False  # Výběr a pohyb byl nesprávný -> vrátíme False
+
+    # Check if mouse position (x, y) is outside of the playable area
+    def _IsOutsideOfGameboard(self, pos):
+        return (pos[0] < 0 or pos[1] < 0 or pos[0] > WIDTH or pos[1] > HEIGHT)
 
     #Pro pohyb po Select hracího kamene
     def _Move(self, row, col):
