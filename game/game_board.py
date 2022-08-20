@@ -76,7 +76,7 @@ class Game_board:
                 stone = self.game_board[row][col]
                 if stone != 0:
                     stone.draw(win)
-                
+                               
     #Metoda pro pohyb
     #1. pohyb kamene v listu + 2. update 
     def movement(self, stone, row, col):
@@ -87,10 +87,10 @@ class Game_board:
         #Kontrola zda jsme na pozici kdy se stone může stát queen + update hodnot self.black_queens a self.white_queens 
         if row == ROW - 1 or row == 0: #Jestliže jsme na pozici 0 nebo 7 tak jsme na konci či začátku hrací plohcy => kámen se stává dámou 
             stone.make_queen()
-            if stone.color == BLACK:
+            if stone.color == BLACK and not stone.queen :
                 self.black_queens += 1
-            else: 
-                self.white_queens += 1               
+            elif stone.color == WHITE and not stone.queen: 
+                self.white_queens += 1     
        
     #Metoda pro stone aby jsme jej mohli předat do movement v main()         
     def get_stone(self, row, col):
@@ -166,7 +166,7 @@ class Game_board:
                 #Kontrola zda můžeme double or triple
                 if last:
                     if step == -1:
-                        row = max(r-3,0)
+                        row = max(r-3,-1) #Fix for white double jump 0 -> -1
                     else:
                         row = min(r+3, ROW)
                     
@@ -209,7 +209,7 @@ class Game_board:
                 #Kontrola zda můžeme double or triple
                 if last:
                     if step == -1:
-                        row = max(r-3,0)
+                        row = max(r-3,-1)
                     else:
                         row = min(r+3, ROW)
                     
@@ -228,6 +228,26 @@ class Game_board:
             right += 1
             
         return moves
+    
+#Methods for AI
+
+        # Game board visualisation for reference
+        # [[Stone(), 0, Stone()]
+        # [0, Stone(), 0]
+        # []]
+        
+    #Score for AI (better evaluate => better AI) => BLACK is AI, for now (perhaps make it a choise?)
+    def evaluate(self):
+        return self.black_left - self.white_left# + (self.black_queens * 0.5 - self.white_queens * 0.5) 
+    
+    #Returns the number of stones of a specific colour 
+    def get_all_stones(self, color):
+        stones = []
+        for row in self.game_board:
+            for stone in row:
+                if stone != 0 and stone.color == color:
+                    stones.append(stone)
+        return stones
             
     @property
     def game_board(self):
