@@ -4,7 +4,6 @@
 # - Vybrání hracího kamene a další...
 #Musíme potom ještě implementovat AI pro samotné hraní hry
 
-from shutil import move
 import pygame
 
 from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN
