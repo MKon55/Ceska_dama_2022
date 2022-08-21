@@ -2,15 +2,15 @@
 # Pro pygame => pip install pygame
 import sys
 import pygame
-
 import pygame_menu
 
 # Importování modulu ze game
 from game.screen_manager import WIDTH, HEIGHT
-from game.stat_values import SQUARE_SIZE, MENUTHEME
+from game.stat_values import SQUARE_SIZE, MENUTHEME, BLACK, WHITE
 import game.file_picker
 from game.file_manager import FileManager
 from game.game_movement import Gameing
+from AI_Minimax.algorithm import minimax
 
 FPS = 60
 
@@ -63,7 +63,8 @@ def Main(loadedGame=None, turn=None):
     game_running = True
     gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
     game = Gameing(WIN)
-
+    AI_game =  True #if True game will be Player vs AI, AI will be Black and Player will be White 
+   
     # Load a game if we get a board
     if loadedGame is not None:
         game.board.LoadBoard(loadedGame)
@@ -74,6 +75,11 @@ def Main(loadedGame=None, turn=None):
     while game_running:
         gaming_time.tick(FPS)
 
+        #Method calls minimax algorith on colour
+        if AI_game is True and game.turn == BLACK:
+            value, new_board = minimax(game.get_board(), 4, BLACK, game) #depth = 3, bigger number better ai but longer calculations, value, new board => tuple
+            game.AI_move(new_board)
+        
         #Win => ukončení hry, potom můžeme vylepšit
         if game.GameWinner() != None:
             print("The mission, the nightmare... they are finally... over.")
