@@ -13,7 +13,7 @@ def minimax(position, depth, max_player, game):
         return position.evaluate(), position
     
     if max_player:
-        maxEvaluate = float('-inf') #If we haven't found anything yet, it's -inf
+        maxEvaluate = float('-100') #If we haven't found anything yet, it's -inf
         best_move = None #Stores best move we can make
         for move in get_all_moves(position, BLACK, game): #For every move eval => calls minimax (reculsive) 
             evaluation = minimax(move, depth-1, False, game)[0] #returns board and value
@@ -23,7 +23,7 @@ def minimax(position, depth, max_player, game):
                 
         return maxEvaluate, best_move
     else:
-        minEvaluate = float('inf') #If we haven't found anything yet, it's inf
+        minEvaluate = float('100') #If we haven't found anything yet, it's inf
         best_move = None #Stores best move we can make
         for move in get_all_moves(position, WHITE, game): #For every move eval => calls minimax (reculsive) 
             evaluation = minimax(move, depth-1, True, game)[0] #returns board and value

@@ -1,7 +1,6 @@
 # Hlavní část programu
 # Pro pygame => pip install pygame
 
-from ast import While
 import sys
 import pygame
 import pygame_menu
@@ -133,7 +132,7 @@ def main(loaded_game=None):  # Main game loop
 
         #Method calls minimax algorith on colour
         if AI_game is True and game.turn == BLACK:
-            value, new_board = minimax(game.get_board(), 3, BLACK, game) #depth = 3, bigger number better ai but longer calculations
+            value, new_board = minimax(game.get_board(), 4, BLACK, game) #depth = 3, bigger number better ai but longer calculations, value, new board => tuple
             game.AI_move(new_board)
         
         #Win => ukončení hry, potom můžeme vylepšit

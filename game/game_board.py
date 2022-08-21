@@ -9,8 +9,10 @@ from .stone import Stone
 class Game_board:
     def __init__(self):
         self._game_board = []
-        self.black_left = self.white_left = 12
-        self.black_queens = self.white_queens = 0
+        self.black_left = 12
+        self.white_left = 12
+        self.black_queens = 0
+        self.white_queens = 0
         self.create_game_board()
 
     # Metoda vytvoří herní plochu
@@ -87,7 +89,7 @@ class Game_board:
         #Kontrola zda jsme na pozici kdy se stone může stát queen + update hodnot self.black_queens a self.white_queens 
         if row == ROW - 1 or row == 0: #Jestliže jsme na pozici 0 nebo 7 tak jsme na konci či začátku hrací plohcy => kámen se stává dámou 
             stone.make_queen()
-            if stone.color == BLACK and not stone.queen :
+            if stone.color == BLACK and not stone.queen:
                 self.black_queens += 1
             elif stone.color == WHITE and not stone.queen: 
                 self.white_queens += 1     
@@ -238,7 +240,8 @@ class Game_board:
         
     #Score for AI (better evaluate => better AI) => BLACK is AI, for now (perhaps make it a choise?)
     def evaluate(self):
-        return self.black_left - self.white_left# + (self.black_queens * 0.5 - self.white_queens * 0.5) 
+        return self.black_left - self.white_left + (self.black_queens * 1.5 - self.white_queens * 1.5)
+        #If AI can jump => AI must jump 
     
     #Returns the number of stones of a specific colour 
     def get_all_stones(self, color):
