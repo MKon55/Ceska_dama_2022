@@ -34,7 +34,7 @@ def StartPlayers():
 
 # Start the game against ai
 def StartAi():
-    Main()
+    Main(AI=True)
 
 
 # Start the game from a .csv file
@@ -59,11 +59,10 @@ def MainMenu():
 
 
 # Main game loop
-def Main(loadedGame=None, turn=None):
+def Main(loadedGame=None, turn=None, AI=False):
     game_running = True
     gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
     game = Gameing(WIN)
-    AI_game =  True #if True game will be Player vs AI, AI will be Black and Player will be White 
    
     # Load a game if we get a board
     if loadedGame is not None:
@@ -76,7 +75,7 @@ def Main(loadedGame=None, turn=None):
         gaming_time.tick(FPS)
 
         #Method calls minimax algorith on colour
-        if AI_game is True and game.turn == BLACK:
+        if AI is True and game.turn == BLACK:
             value, new_board = minimax(game.get_board(), 4, BLACK, game) #depth = 3, bigger number better ai but longer calculations, value, new board => tuple
             game.AI_move(new_board)
         

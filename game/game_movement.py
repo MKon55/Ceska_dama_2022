@@ -4,6 +4,7 @@
 # - Vybrání hracího kamene a další...
 #Musíme potom ještě implementovat AI pro samotné hraní hry
 
+from shutil import move
 import pygame
 
 from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN
@@ -43,6 +44,7 @@ class Gameing:
             #Jestliže náš pohyb není validní tak pohyb nebude proveden a znovu zavoláme metodu Select
             if not result:
                 self.selected_stone = None
+                self.correct_moves = {}
                 self.Select(row, col)
 
         stone = self.board.GetStone(row, col)
@@ -101,4 +103,4 @@ class Gameing:
     #Method returns new board after AI move => updates game with new board object 
     def AI_move(self, board):
         self.board = board
-        self.change_turn()
+        self.ChangeTurn()

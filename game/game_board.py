@@ -248,7 +248,7 @@ class GameBoard:
     #Returns the number of stones of a specific colour 
     def get_all_stones(self, color):
         stones = []
-        for row in self.game_board:
+        for row in self.GameBoard:
             for stone in row:
                 if stone != 0 and stone.color == color:
                     stones.append(stone)
