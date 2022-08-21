@@ -101,4 +101,4 @@ class Gameing:
     #Method returns new board after AI move => updates game with new board object 
     def AI_move(self, board):
         self.board = board
-        self.change_turn()
+        self.ChangeTurn()

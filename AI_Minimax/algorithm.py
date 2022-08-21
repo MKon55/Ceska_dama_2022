@@ -9,7 +9,7 @@ WHITE = (255, 255, 255)
 #Minimax method 
 def minimax(position, depth, max_player, game):
     #position => current board position, object 
-    if depth == 0 or position.winner() != None:
+    if depth == 0 or position.Winner() != None:
         return position.evaluate(), position
     
     if max_player:
@@ -35,9 +35,9 @@ def minimax(position, depth, max_player, game):
 
 #Method for move simulation on temp board
 def possible_move(stone, move, board, game, skip):
-    board.movement(stone, move[0], move[1])
+    board.Movement(stone, move[0], move[1])
     if skip:
-        board.remove(skip)
+        board.Remove(skip)
         
     return board
 
@@ -46,10 +46,10 @@ def get_all_moves(board, colour, game):
     moves = [] #Stores new board [[board, stone], [new_board, stone]]
     
     for stone in board.get_all_stones(colour):
-        correct_moves = board.get_correct_moves(stone)
+        correct_moves = board.GetCorrectMoves(stone)
         for move, skip in correct_moves.items(): #Loop for all items (row, col): [stones] if correct 
             temp_board = deepcopy(board)
-            temp_stone = temp_board.get_stone(stone.row, stone.col)
+            temp_stone = temp_board.GetStone(stone.row, stone.col)
             new_board = possible_move(temp_stone, move, temp_board, game, skip) #returns new board after move 
             moves.append(new_board)
             
