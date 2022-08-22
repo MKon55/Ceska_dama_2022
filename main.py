@@ -84,6 +84,9 @@ def Main(loadedGame=None, turn=None):
             if event.type == pygame.QUIT:
                 game_running = False
 
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                game.ButtonClick(pos)
+
             if event.type == pygame.MOUSEBUTTONUP:  # Pro klikání myší, zjišťuje na co jsme klikly a co můžeme dělat
                 row, col = GetMousePos(pos)
                 game.Select(row, col, pos)

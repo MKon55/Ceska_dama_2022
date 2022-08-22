@@ -31,6 +31,15 @@ GREEN = (0, 100, 0)
 BOARD_WHITE = (232, 208, 170)
 BOARD_BLACK = (166, 125, 93)
 
+# Other colors
+SIDEBAR_BG = (204, 255, 224)
+BUTTON_BG = (184, 230, 202)
+BUTTON_TEXT = (51, 64, 56)
+BUTTON_HOVER = (102, 128, 112)
+BUTTON_HOVER_TEXT = (51, 64, 56)
+BUTTON_PRESS = (51, 64, 56)
+BUTTON_PRESS_TEXT = (0, 0, 0)
+
 # Načtení crown from assets + transform pro správnou velikost
 CROWN = pygame.transform.scale(pygame.image.load(PATH + 'assets/crown.png'), (40, 40))
 

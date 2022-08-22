@@ -7,11 +7,10 @@
 import pygame
 from datetime import datetime
 
-from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN
-from game.screen_manager import WIDTH, HEIGHT
+from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG
+from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
 from game.game_board import GameBoard
 from game.button import Button
-# from game.file_manager import FileManager
 
 
 class Gameing:
@@ -20,11 +19,13 @@ class Gameing:
     def __init__(self, win):
         self._StartCall()
         self.win = win
-        self.saveBtn = Button(WIDTH, 50, "Uložit Hru")
+        self.saveBtn = Button(WIDTH + 110, HEIGHT - 50, "Uložit Hru")
 
      #Update display, nyní jej nemusíme mít ve main.py
     def Update(self, mouse_pos):
         self.board.Draw(self.win)
+        sidebar = pygame.Rect(WIDTH, 0, WINDOW_WIDTH - WIDTH, WINDOW_HEIGHT)
+        pygame.draw.rect(self.win, SIDEBAR_BG, sidebar)
         self.saveBtn.hover(mouse_pos)
         self.DrawCorrectMoves(self.correct_moves)
         self.saveBtn.draw(self.win)
@@ -46,6 +47,7 @@ class Gameing:
     #Metoda pro vyběr hracího kamene -> určí row a col -> hýbne s hracím kamenem dle našeho výběru
     def Select(self, row, col, pos):
         # Check if the click happened on a button
+        self.saveBtn.release()
         if self.saveBtn.isMouseInside(pos):
             from game.file_manager import FileManager
             stamp = "dama-save-" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -69,6 +71,9 @@ class Gameing:
             return True  # Výběr a pohyb je správný -> vrátíme True
 
         return False  # Výběr a pohyb byl nesprávný -> vrátíme False
+
+    def ButtonClick(self, pos):
+        self.saveBtn.click(pos)
 
     # Check if mouse position (x, y) is outside of the playable area
     def _IsOutsideOfGameboard(self, pos):
