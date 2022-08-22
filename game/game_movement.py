@@ -62,7 +62,7 @@ class Gameing:
             if not result:
                 self.selected_stone = None
                 self.correct_moves = {}  # Clear the moves when piece is deselected
-                self.Select(row, col)
+                self.Select(row, col, pos)
 
         stone = self.board.GetStone(row, col)
         #Jestliže hrací kámen který jsme vybrali existuje a vybrali jsme SVOJI barvu
@@ -116,15 +116,15 @@ class Gameing:
 
     def SetTurn(self, color):
         self.turn = color
-        Gameing.turn = self.turn            
+        Gameing.turn = self.turn
 
     #Methods for AI
 
     #Method for gatting board object
     def get_board(self):
         return self.board
-    
-    #Method returns new board after AI move => updates game with new board object 
+
+    #Method returns new board after AI move => updates game with new board object
     def AI_move(self, board):
         self.board = board
         self.ChangeTurn()
