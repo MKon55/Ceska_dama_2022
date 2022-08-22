@@ -1,20 +1,21 @@
 import pygame
 import pygame_gui
 
-from game.screen_manager import WIDTH, HEIGHT
+from game.screen_manager import WINDOW_WIDTH, WINDOW_HEIGHT
 from config.localconfig import PATH
 from pygame_gui.windows.ui_file_dialog import UIFileDialog
 from pygame.rect import Rect
+from pathlib import Path
 
 
 # Window for picking a file to load
 def FilePicker():
-    window_surface = pygame.display.set_mode((WIDTH, HEIGHT))
+    window_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-    background = pygame.Surface((WIDTH, HEIGHT))
+    background = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
     background.fill(pygame.Color('#ccffe0'))
 
-    manager = pygame_gui.UIManager((HEIGHT, HEIGHT), PATH + "gui_theme.json")
+    manager = pygame_gui.UIManager((WINDOW_WIDTH, WINDOW_HEIGHT), PATH + "gui_theme.json")
     clock = pygame.time.Clock()
 
     file_selection = OpenUiFileDialog(manager)
@@ -44,7 +45,9 @@ def FilePicker():
 
 # Helping function for FilePicker()
 def OpenUiFileDialog(manager):
-    file_selection = UIFileDialog(rect=Rect(0, 0, WIDTH, HEIGHT), manager=manager, allow_picking_directories=False, window_title="Vybrat uloženou hru")
+    base_path = Path(__file__).parent
+    save_path = (base_path / "../saves/").resolve()
+    file_selection = UIFileDialog(rect=Rect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT), manager=manager, allow_picking_directories=False, window_title="Vybrat uloženou hru", initial_file_path=save_path)
     file_selection.cancel_button.set_text("Zpět")
     file_selection.home_button.tool_tip_text = "Domů"
     file_selection.delete_button.tool_tip_text = "Odstranit"

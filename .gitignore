@@ -2,4 +2,7 @@
 __pycache/
 game/__pycache__/
 game/__pycache__/*
+AI_Minimax/__pycache__/
+AI_Minimax/__pycache__/*
 config/
+*.csv
