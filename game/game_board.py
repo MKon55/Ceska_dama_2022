@@ -133,16 +133,30 @@ class GameBoard:
         left = stone.col - 1
         right = stone.col + 1
         row = stone.row
+        col = stone.col
 
         #Kontrola barvy + PROZATÍM nechávám dámu ve stejném pohybu musíme ještě implementovat specifický pohyb dámy => pohyb po celé diagonále + dáma má přednost!!
-        if stone.color == WHITE or isinstance(stone, PieceQueen):
+        if stone.color == WHITE and isinstance(stone, PieceNormal):
             #Jsme White pohybujeme se nahoru, Jak "hodně nahoru se koukáme"
             moves.update(self._MovementLeft(row - 1, max(row-3, -1), -1, stone.color, left))
             moves.update(self._MovementRight(row - 1, max(row-3, -1), -1, stone.color, right))
 
-        if stone.color == BLACK or isinstance(stone, PieceQueen):
+        if stone.color == BLACK and isinstance(stone, PieceNormal):
             #Nyní se pohybujeme dolů tudíž +1, min()
             moves.update(self._MovementLeft(row + 1, min(row+3, ROW), 1, stone.color, left))
+            moves.update(self._MovementRight(row + 1, min(row+3, ROW), 1, stone.color, right))
+            
+        if isinstance(stone, PieceQueen):
+            left = col - 1
+            right = col + 1
+            
+            #Movement LEFT -> UP
+            moves.update(self._MovementLeft(row - 1, max(row-3, -1), -1, stone.color, left))
+            #Movement LEFT -> DOWN
+            moves.update(self._MovementLeft(row + 1, min(row+3, ROW), 1, stone.color, left))
+            #Movement RIGHT -> UP
+            moves.update(self._MovementRight(row - 1, max(row-3, -1), -1, stone.color, right))
+            #Movement RIGHT -> DOWN
             moves.update(self._MovementRight(row + 1, min(row+3, ROW), 1, stone.color, right))
 
         return moves
@@ -151,14 +165,14 @@ class GameBoard:
     def _MovementLeft(self, start, stop, step, color, left, skipped=[]):  # step určí jakým směrem se pohybujeme, skip určí zda jsme nějakou přeskočili
         moves = {}
         last = []
-        for r in range(start, stop, step):
+        for r in range(start, stop, step): #r -> new piece.row
             if left < 0:  # Jestliže koumáme již mimo hrací pole
                 break
 
             #Traversování do levé strany
-            current = self.GameBoard[r][left]
+            potential_move = self.GameBoard[r][left]
             #Pokud == 0 tak jsme našli prazdné pole do kterého se můžeme hýbnout
-            if current == 0:
+            if potential_move == 0:
                 if skipped and not last:
                     break  # Jestliže jsme přeskočili a již nemůžeme nic jiného přeskočit tak už se nemůžeme hýbat
                 elif skipped:
@@ -180,11 +194,11 @@ class GameBoard:
                 break  # Pro jistotu aby byl pohyb zastaven po double or triple
 
             #Pokud poli je hrací kámen který je stejné barvy tak se tam nemůžeme hýbnout
-            elif current.color == color:
+            elif potential_move.color == color:
                 break
             #Pokud to není naší barvy tak je to protihráčovo kámen a můžeme se hýbnout S TÍM  že předpokládáme že za ní je prázdné pole
             else:
-                last = [current]
+                last = [potential_move]
 
             left -= 1
 
@@ -199,9 +213,9 @@ class GameBoard:
                 break
 
             #Traversování do pravé strany
-            current_move = self.GameBoard[r][right]
+            potential_move_move = self.GameBoard[r][right]
             #Pokud == 0 tak jsme našli prazdné pole do kterého se můžeme hýbnout
-            if current_move == 0:
+            if potential_move_move == 0:
                 if skipped and not last:
                     break  # Jestliže jsme přeskočili a již nemůžeme nic jiného přeskočit tak už se nemůžeme hýbat
                 elif skipped:
@@ -223,11 +237,11 @@ class GameBoard:
                 break  # Pro jistotu aby byl pohyb zastaven po double or triple
 
             #Pokud poli je hrací kámen který je stejné barvy tak se tam nemůžeme hýbnout
-            elif current_move.color == color:
+            elif potential_move_move.color == color:
                 break
             #Pokud to není naší barvy tak je to protihráčovo kámen a můžeme se hýbnout S TÍM  že předpokládáme že za ní je prázdné pole
             else:
-                last = [current_move]
+                last = [potential_move_move]
 
             right += 1
 
@@ -242,7 +256,7 @@ class GameBoard:
         
     #Score for AI (better evaluate => better AI) => BLACK is AI, for now (perhaps make it a choise?)
     def evaluate(self):
-        return self.black_left - self.white_left + (self.black_queens * 1.5 - self.white_queens * 1.5)
+        return self.black_left * 1.5 - self.white_left + (self.black_queens - self.white_queens * 1.5)
         #If AI can jump => AI must jump 
     
     #Returns the number of stones of a specific colour 
