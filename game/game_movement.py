@@ -5,9 +5,12 @@
 #Musíme potom ještě implementovat AI pro samotné hraní hry
 
 import pygame
+from datetime import datetime
 
-from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN
+from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG
+from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
 from game.game_board import GameBoard
+from game.button import Button
 
 
 class Gameing:
@@ -16,11 +19,16 @@ class Gameing:
     def __init__(self, win):
         self._StartCall()
         self.win = win
+        self.saveBtn = Button(WIDTH + 110, HEIGHT - 50, "Uložit Hru")
 
      #Update display, nyní jej nemusíme mít ve main.py
-    def Update(self):
+    def Update(self, mouse_pos):
         self.board.Draw(self.win)
+        sidebar = pygame.Rect(WIDTH, 0, WINDOW_WIDTH - WIDTH, WINDOW_HEIGHT)
+        pygame.draw.rect(self.win, SIDEBAR_BG, sidebar)
+        self.saveBtn.hover(mouse_pos)
         self.DrawCorrectMoves(self.correct_moves)
+        self.saveBtn.draw(self.win)
         pygame.display.update()
 
     def _StartCall(self):
@@ -37,13 +45,23 @@ class Gameing:
        self._StartCall()
 
     #Metoda pro vyběr hracího kamene -> určí row a col -> hýbne s hracím kamenem dle našeho výběru
-    def Select(self, row, col):
+    def Select(self, row, col, pos):
+        # Check if the click happened on a button
+        self.saveBtn.release()
+        if self.saveBtn.isMouseInside(pos):
+            from game.file_manager import FileManager
+            stamp = "dama-save-" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            FileManager.SaveFile(self.board.GameBoard, stamp)
+
+        if self._IsOutsideOfGameboard(pos):
+            return False
+
         if self.selected_stone:
             result = self._Move(row, col)
             #Jestliže náš pohyb není validní tak pohyb nebude proveden a znovu zavoláme metodu Select
             if not result:
                 self.selected_stone = None
-                self.correct_moves = {}
+                self.correct_moves = {}  # Clear the moves when piece is deselected
                 self.Select(row, col)
 
         stone = self.board.GetStone(row, col)
@@ -54,6 +72,13 @@ class Gameing:
             return True  # Výběr a pohyb je správný -> vrátíme True
 
         return False  # Výběr a pohyb byl nesprávný -> vrátíme False
+
+    def ButtonClick(self, pos):
+        self.saveBtn.click(pos)
+
+    # Check if mouse position (x, y) is outside of the playable area
+    def _IsOutsideOfGameboard(self, pos):
+        return (pos[0] < 0 or pos[1] < 0 or pos[0] > WIDTH or pos[1] > HEIGHT)
 
     #Pro pohyb po Select hracího kamene
     def _Move(self, row, col):

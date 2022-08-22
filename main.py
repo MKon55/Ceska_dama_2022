@@ -5,7 +5,7 @@ import pygame
 import pygame_menu
 
 # Importování modulu ze game
-from game.screen_manager import WIDTH, HEIGHT
+from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
 from game.stat_values import SQUARE_SIZE, MENUTHEME, BLACK, WHITE
 import game.file_picker
 from game.file_manager import FileManager
@@ -15,7 +15,7 @@ from AI_Minimax.algorithm import minimax
 FPS = 60
 
 pygame.init()
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+WIN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Dáma")  # Název hry
 
 
@@ -53,7 +53,7 @@ def LoadGameAI():
 
 # Main menu (opens first)
 def MainMenu():
-    menu = pygame_menu.Menu('Dáma', WIDTH, HEIGHT, theme=MENUTHEME)
+    menu = pygame_menu.Menu('Dáma', WINDOW_WIDTH, WINDOW_HEIGHT, theme=MENUTHEME)
 
     menu.add.button('Hrát ve dvou', StartPlayers)
     menu.add.button('Hrát proti AI', StartAi)
@@ -75,8 +75,6 @@ def Main(loadedGame=None, turn=None, AI=False):
         game.board.LoadBoard(loadedGame)
         game.SetTurn(turn)
 
-    FileManager.SaveFile(game.board.GameBoard, "savegame2")
-
     while game_running:
         gaming_time.tick(FPS)
 
@@ -90,17 +88,21 @@ def Main(loadedGame=None, turn=None, AI=False):
             print("The mission, the nightmare... they are finally... over.")
             game_running = False
 
+        pos = pygame.mouse.get_pos()
+
         for event in pygame.event.get():
             # Event pro pygame => ukončení hry (button)
             if event.type == pygame.QUIT:
                 game_running = False
 
-            if event.type == pygame.MOUSEBUTTONUP:  # Pro klikání myší, zjišťuje na co jsme klikly a co můžeme dělat
-                pos = pygame.mouse.get_pos()
-                row, col = GetMousePos(pos)
-                game.Select(row, col)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                game.ButtonClick(pos)
 
-        game.Update()
+            if event.type == pygame.MOUSEBUTTONUP:  # Pro klikání myší, zjišťuje na co jsme klikly a co můžeme dělat
+                row, col = GetMousePos(pos)
+                game.Select(row, col, pos)
+
+        game.Update(pos)
 
     pygame.quit()  # ukončení window pro hru
     sys.exit()
