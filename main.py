@@ -2,15 +2,15 @@
 # Pro pygame => pip install pygame
 import sys
 import pygame
-
 import pygame_menu
 
 # Importování modulu ze game
 from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
-from game.stat_values import SQUARE_SIZE, MENUTHEME
+from game.stat_values import SQUARE_SIZE, MENUTHEME, BLACK, WHITE
 import game.file_picker
 from game.file_manager import FileManager
 from game.game_movement import Gameing
+from AI_Minimax.algorithm import minimax
 
 FPS = 60
 
@@ -34,16 +34,21 @@ def StartPlayers():
 
 # Start the game against ai
 def StartAi():
-    Main()
+    Main(AI=True)
 
 
 # Start the game from a .csv file
-def LoadGame():
+def LoadGame(AI=False):
     pathToFile = game.file_picker.FilePicker()
     if pathToFile is None:
         return
     loadedGame, turn = FileManager().ReadFile(pathToFile)
-    Main(loadedGame, turn)
+    Main(loadedGame, turn, AI=AI)
+
+
+# Load the game and play against ai
+def LoadGameAI():
+    LoadGame(AI=True)
 
 
 # Main menu (opens first)
@@ -53,13 +58,14 @@ def MainMenu():
     menu.add.button('Hrát ve dvou', StartPlayers)
     menu.add.button('Hrát proti AI', StartAi)
     menu.add.button('Nahrát hru', LoadGame)
+    menu.add.button('Nahrát hru (AI)', LoadGameAI)
     menu.add.button('Ukončit', pygame_menu.events.EXIT)
 
     menu.mainloop(WIN)
 
 
 # Main game loop
-def Main(loadedGame=None, turn=None):
+def Main(loadedGame=None, turn=None, AI=False):
     game_running = True
     gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
     game = Gameing(WIN)
@@ -72,8 +78,13 @@ def Main(loadedGame=None, turn=None):
     while game_running:
         gaming_time.tick(FPS)
 
+        #Method calls minimax algorith on colour
+        if AI is True and game.turn == BLACK:
+            value, new_board = minimax(game.get_board(), 4, BLACK, game)  # depth = 3, bigger number better ai but longer calculations, value, new board => tuple
+            game.AI_move(new_board)
+
         #Win => ukončení hry, potom můžeme vylepšit
-        if game.GameWinner() != None:
+        if game.GameWinner() is not None:
             print("The mission, the nightmare... they are finally... over.")
             game_running = False
 

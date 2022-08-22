@@ -11,8 +11,10 @@ from .piece_queen import PieceQueen
 class GameBoard:
     def __init__(self):
         self._GameBoard = []
-        self.black_left = self.white_left = 12
-        self.black_queens = self.white_queens = 0
+        self.black_left = 12
+        self.white_left = 12
+        self.black_queens = 0
+        self.white_queens = 0
         self.CreateGameBoard()
 
     # Metoda vytvoří herní plochu
@@ -78,24 +80,23 @@ class GameBoard:
                 stone = self.GameBoard[row][col]
                 if stone != 0:
                     stone.Draw(win)
-
     #Metoda pro pohyb
     #1. pohyb kamene v listu + 2. update
     def Movement(self, stone, row, col):
         # Prohození pozic hodnot; nemusíme vytvářet temp
         self.GameBoard[stone.row][stone.col], self.GameBoard[row][col] = self.GameBoard[row][col], self.GameBoard[stone.row][stone.col]
         stone.Move(row, col)
-
-        #Kontrola zda jsme na pozici kdy se stone může stát queen + update hodnot self.black_queens a self.white_queens
-        if row == ROW - 1 or row == 0:  # Jestliže jsme na pozici 0 nebo 7 tak jsme na konci či začátku hrací plohcy => kámen se stává dámou
+        
+        #Kontrola zda jsme na pozici kdy se stone může stát queen + update hodnot self.black_queens a self.white_queens 
+        if row == ROW - 1 or row == 0: #Jestliže jsme na pozici 0 nebo 7 tak jsme na konci či začátku hrací plohcy => kámen se stává dámou 
             queen = PieceQueen.fromPiece(stone)
             self.GameBoard[queen.row][queen.col] = queen
             if queen.color == BLACK:
                 self.black_queens += 1
-            else:
-                self.white_queens += 1
+            elif queen.color == WHITE: 
+                self.white_queens += 1     
 
-    #Metoda pro stone aby jsme jej mohli předat do M v main()
+    #Metoda pro stone aby jsme jej mohli předat do movement v main()
     def GetStone(self, row, col):
         return self.GameBoard[row][col]
 
@@ -169,7 +170,7 @@ class GameBoard:
                 #Kontrola zda můžeme double or triple
                 if last:
                     if step == -1:
-                        row = max(r-3, 0)
+                        row = max(r-3,-1) #Fix for white double jump 0 -> -1
                     else:
                         row = min(r+3, ROW)
 
@@ -212,7 +213,7 @@ class GameBoard:
                 #Kontrola zda můžeme double or triple
                 if last:
                     if step == -1:
-                        row = max(r-3, 0)
+                        row = max(r-3,-1)
                     else:
                         row = min(r+3, ROW)
 
@@ -231,7 +232,28 @@ class GameBoard:
             right += 1
 
         return moves
+        
+        #Methods for AI
 
+        # Game board visualisation for reference
+        # [[Stone(), 0, Stone()]
+        # [0, Stone(), 0]
+        # []]
+        
+    #Score for AI (better evaluate => better AI) => BLACK is AI, for now (perhaps make it a choise?)
+    def evaluate(self):
+        return self.black_left - self.white_left + (self.black_queens * 1.5 - self.white_queens * 1.5)
+        #If AI can jump => AI must jump 
+    
+    #Returns the number of stones of a specific colour 
+    def get_all_stones(self, color):
+        stones = []
+        for row in self.GameBoard:
+            for stone in row:
+                if stone != 0 and stone.color == color:
+                    stones.append(stone)
+        return stones
+        
     @property
     def GameBoard(self):
         return self._GameBoard
