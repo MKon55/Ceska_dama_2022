@@ -38,12 +38,17 @@ def StartAi():
 
 
 # Start the game from a .csv file
-def LoadGame():
+def LoadGame(AI=False):
     pathToFile = game.file_picker.FilePicker()
     if pathToFile is None:
         return
     loadedGame, turn = FileManager().ReadFile(pathToFile)
-    Main(loadedGame, turn)
+    Main(loadedGame, turn, AI=AI)
+
+
+# Load the game and play against ai
+def LoadGameAI():
+    LoadGame(AI=True)
 
 
 # Main menu (opens first)
@@ -53,6 +58,7 @@ def MainMenu():
     menu.add.button('Hrát ve dvou', StartPlayers)
     menu.add.button('Hrát proti AI', StartAi)
     menu.add.button('Nahrát hru', LoadGame)
+    menu.add.button('Nahrát hru (AI)', LoadGameAI)
     menu.add.button('Ukončit', pygame_menu.events.EXIT)
 
     menu.mainloop(WIN)
@@ -63,7 +69,7 @@ def Main(loadedGame=None, turn=None, AI=False):
     game_running = True
     gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
     game = Gameing(WIN)
-   
+
     # Load a game if we get a board
     if loadedGame is not None:
         game.board.LoadBoard(loadedGame)
@@ -76,11 +82,11 @@ def Main(loadedGame=None, turn=None, AI=False):
 
         #Method calls minimax algorith on colour
         if AI is True and game.turn == BLACK:
-            value, new_board = minimax(game.get_board(), 4, BLACK, game) #depth = 3, bigger number better ai but longer calculations, value, new board => tuple
+            value, new_board = minimax(game.get_board(), 4, BLACK, game)  # depth = 3, bigger number better ai but longer calculations, value, new board => tuple
             game.AI_move(new_board)
-        
+
         #Win => ukončení hry, potom můžeme vylepšit
-        if game.GameWinner() != None:
+        if game.GameWinner() is not None:
             print("The mission, the nightmare... they are finally... over.")
             game_running = False
 
