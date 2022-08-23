@@ -24,11 +24,14 @@ class Gameing:
      #Update display, nyní jej nemusíme mít ve main.py
     def Update(self, mouse_pos):
         self.board.Draw(self.win)
+
         sidebar = pygame.Rect(WIDTH, 0, WINDOW_WIDTH - WIDTH, WINDOW_HEIGHT)
         pygame.draw.rect(self.win, SIDEBAR_BG, sidebar)
+
         self.saveBtn.hover(mouse_pos)
-        self.DrawCorrectMoves(self.correct_moves)
         self.saveBtn.draw(self.win)
+
+        self.DrawCorrectMoves(self.correct_moves)
         pygame.display.update()
 
     def _StartCall(self):
@@ -53,6 +56,7 @@ class Gameing:
             stamp = "dama-save-" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             FileManager.SaveFile(self.board.GameBoard, stamp)
 
+        # Will crash if we try to find a stone outside the game board
         if self._IsOutsideOfGameboard(pos):
             return False
 
@@ -69,6 +73,7 @@ class Gameing:
         if stone != 0 and stone.color == self.turn:
             self.selected_stone = stone
             self.correct_moves = self.board.GetCorrectMoves(stone)
+            self.correct_moves[(stone.row, stone.col)] = []  # Shows which piece is selected
             return True  # Výběr a pohyb je správný -> vrátíme True
 
         return False  # Výběr a pohyb byl nesprávný -> vrátíme False
@@ -102,7 +107,10 @@ class Gameing:
     def DrawCorrectMoves(self, moves):
         for move in moves:
             row, col = move
-            pygame.draw.circle(self.win, GREEN, (col * SQUARE_SIZE + SQUARE_SIZE//2, row * SQUARE_SIZE + SQUARE_SIZE//2), 15)
+            s = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE))
+            s.set_alpha(80)
+            s.fill(GREEN)
+            self.win.blit(s, (col * SQUARE_SIZE, row * SQUARE_SIZE))
 
     #Metoda pro změnu tahu
     def ChangeTurn(self):
