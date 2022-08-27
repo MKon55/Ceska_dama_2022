@@ -13,7 +13,6 @@ from game.game_movement import Gameing
 from AI_Minimax.algorithm import minimax
 
 FPS = 60
-
 pygame.init()
 WIN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Dáma")  # Název hry
@@ -102,14 +101,14 @@ def Main(loadedGame=None, turn=None, AI=False):
                 row, col = GetMousePos(pos)
                 game.Select(row, col, pos)
 
-        game.Update(pos)
+        if game.Update(pos) is False:
+            MainMenu()
 
     pygame.quit()  # ukončení window pro hru
     sys.exit()
 
 
 MainMenu()
-
 #vytvoření "předgui" pro načtení ze souboru .csv nebo začátek nové partie
 #   Něco jako Main menu ve hře
 #   Vedle hracího pole ještě počet herních kamenů, počet dám a jaký hráč je na tahu (převděpodobně na pravé straně okna pygame)

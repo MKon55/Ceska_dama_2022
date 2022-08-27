@@ -19,7 +19,9 @@ class Gameing:
     def __init__(self, win):
         self._StartCall()
         self.win = win
-        self.saveBtn = Button(WIDTH + 110, HEIGHT - 50, "Uložit Hru")
+        self.saveBtn = Button(WIDTH + 110, HEIGHT - 50, "Uložit Hru", self.SaveButtonAction)
+        self.backBtn = Button(WIDTH + 140 + self.saveBtn.rect.width, HEIGHT - 50, "Hlavní Menu", self.BackButtonAction)
+        self.buttons = [self.saveBtn, self.backBtn]
 
      #Update display, nyní jej nemusíme mít ve main.py
     def Update(self, mouse_pos):
@@ -28,17 +30,24 @@ class Gameing:
         sidebar = pygame.Rect(WIDTH, 0, WINDOW_WIDTH - WIDTH, WINDOW_HEIGHT)
         pygame.draw.rect(self.win, SIDEBAR_BG, sidebar)
 
-        self.saveBtn.hover(mouse_pos)
-        self.saveBtn.draw(self.win)
+        # Update all the buttons
+        for btn in self.buttons:
+            btn.hover(mouse_pos)
+            btn.draw(self.win)
 
         self.DrawCorrectMoves(self.correct_moves)
         pygame.display.update()
+
+        # Tell main that the game should stop
+        if not self.game_running:
+            return False
 
     def _StartCall(self):
         self.selected_stone = None
         self.board = GameBoard()
         self.turn = Gameing.turn  # Tah začíná z pravidla bílí
         self.correct_moves = {}  # Ukaže možné správné pohyby pro daného hráče
+        self.game_running = True  # Flag for main, doesnt actually control if game is running, that's main's job
 
     def GameWinner(self):
         return self.board.Winner()
@@ -50,11 +59,11 @@ class Gameing:
     #Metoda pro vyběr hracího kamene -> určí row a col -> hýbne s hracím kamenem dle našeho výběru
     def Select(self, row, col, pos):
         # Check if the click happened on a button
-        self.saveBtn.release()
-        if self.saveBtn.isMouseInside(pos):
-            from game.file_manager import FileManager
-            stamp = "dama-save-" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            FileManager.SaveFile(self.board.GameBoard, stamp)
+        for btn in self.buttons:
+            btn.release()
+            # run action for every button, end game if we get False back
+            if btn.action(pos) is False:
+                self.game_running = False
 
         # Will crash if we try to find a stone outside the game board
         if self._IsOutsideOfGameboard(pos):
@@ -79,7 +88,8 @@ class Gameing:
         return False  # Výběr a pohyb byl nesprávný -> vrátíme False
 
     def ButtonClick(self, pos):
-        self.saveBtn.click(pos)
+        for btn in self.buttons:
+            btn.click(pos)
 
     # Check if mouse position (x, y) is outside of the playable area
     def _IsOutsideOfGameboard(self, pos):
@@ -112,19 +122,24 @@ class Gameing:
             s.fill(GREEN)
             self.win.blit(s, (col * SQUARE_SIZE, row * SQUARE_SIZE))
 
-    #Metoda pro změnu tahu
+    # Metoda pro změnu tahu
     def ChangeTurn(self):
         self.correct_moves = {}  # Odstraní zelené možnosti po našem tahu
         self.turn = BLACK if self.turn == WHITE else WHITE
         Gameing.turn = self.turn
-        # if self.turn == WHITE:
-        #     self.turn = BLACK
-        # else:
-        #     self.turn = WHITE
 
     def SetTurn(self, color):
         self.turn = color
         Gameing.turn = self.turn
+
+    # Button functions
+    def SaveButtonAction(self):
+        from game.file_manager import FileManager
+        stamp = "dama-save-" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        FileManager.SaveFile(self.board.GameBoard, stamp)
+
+    def BackButtonAction(self):
+        return False
 
     #Methods for AI
 
