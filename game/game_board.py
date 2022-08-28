@@ -155,7 +155,8 @@ class GameBoard:
             #left = col - 1
             #right = col + 1
 
-            moves.update(self._QueenMovement(stone))
+            #moves.update(self._QueenMovement(stone))
+            moves.update(self._GetQueenMoves(stone))
 
             # #Movement LEFT -> UP
             # moves.update(self._MovementLeft(row - 1, max(row-3, -1), -1, stone.color, left))
@@ -174,6 +175,49 @@ class GameBoard:
 
     def _isInbounds(self, pos):
         return pos[0] >= 0 and pos[0] < ROW and pos[1] >= 0 and pos[1] < COL
+
+    def _isGamePiece(self, tile):
+        return isinstance(tile, PieceNormal) or isinstance(tile, PieceQueen)
+
+    def _GetQueenMoves(self, stone):
+        moves = {}
+        left = -1
+        up = -1
+
+        tiles = {}
+        for i in range(1, 8):
+            newRow = stone.row + up * i
+            newCol = stone.col + left * i
+            if self._isInbounds((newRow, newCol)):
+                tiles[(newRow, newCol)] = (self.GameBoard[newRow][newCol])
+
+        idx = -1
+        for tilePos, tile in tiles.items():
+            idx += 1
+            if self._isGamePiece(tile):
+                print("stone")
+                if tile.color != stone.color:
+                    # enemy
+                    if idx + 1 < len(tiles) and list(tiles.values())[idx + 1] == 0:
+                        print("free")
+                        # empty behind enemy
+                        # forced move
+                        # check if any other jumpable enemy is around -> turn should stay
+                        # else, turn changes
+                        self.forcedMoves[list(tiles)[idx + 1]] = tile
+                    else:
+                        # not empty
+                        break
+                else:
+                    # fren
+                    break
+
+            if tile == 0:
+                moves[tilePos] = []
+
+        print(self.forcedMoves)
+        print(moves)
+        return moves
 
     # TODO: Optimize this, so we only check one of the diagonals
     # returns isMoveValid(boolean), jumpedEnemy(None|Stone)
@@ -261,15 +305,15 @@ class GameBoard:
         # Loop 4 times for the 4 axis
         for k in range(4):
 
-            potentialMove = (stone.row + leftRight, stone.col + topBottom)
+            distanceFromSelected = 0
+            potentialMove = (stone.row + leftRight * distanceFromSelected, stone.col + topBottom * distanceFromSelected)
 
-            distanceFromSelected = 1
             while self._isInbounds(potentialMove):
                 isValid, jumpedStone = self._isValidQueenMove(stone.pos, stone.color, potentialMove)
-                if(jumpedStone is not None):
-                    print(potentialMove, isValid, jumpedStone.pos)
-                else:
-                    print(potentialMove, isValid, jumpedStone)
+                # if(jumpedStone is not None):
+                #     print(potentialMove, isValid, jumpedStone.pos)
+                # else:
+                #     print(potentialMove, isValid, jumpedStone)
                 if isValid and jumpedStone is not None:
                     # CODE RED: The move will jump over an enemy
                     # check secondaryJump
@@ -290,7 +334,7 @@ class GameBoard:
                 leftRight = -1
             else:
                 leftRight = 1
-            if k == 1:
+            if k >= 1:
                 topBottom = 1
 
         return moves
