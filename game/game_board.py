@@ -16,7 +16,6 @@ class GameBoard:
         self.black_queens = 0
         self.white_queens = 0
         self.forcedMoves = {}
-        self.blacklistStones = []
         self.CreateGameBoard()
 
     # Metoda vytvoří herní plochu
@@ -152,22 +151,9 @@ class GameBoard:
             moves.update(self._MovementRight(row + 1, min(row+3, ROW), 1, stone.color, right))
 
         if isinstance(stone, PieceQueen):
-            #left = col - 1
-            #right = col + 1
+            queenMoves, turnStays = self._GetQueenMoves(stone)
+            moves.update(queenMoves)
 
-            #moves.update(self._QueenMovement(stone))
-            moves.update(self._GetQueenMoves(stone))
-
-            # #Movement LEFT -> UP
-            # moves.update(self._MovementLeft(row - 1, max(row-3, -1), -1, stone.color, left))
-            # #Movement LEFT -> DOWN
-            # moves.update(self._MovementLeft(row + 1, min(row+3, ROW), 1, stone.color, left))
-            # #Movement RIGHT -> UP
-            # moves.update(self._MovementRight(row - 1, max(row-3, -1), -1, stone.color, right))
-            # #Movement RIGHT -> DOWN
-            # moves.update(self._MovementRight(row + 1, min(row+3, ROW), 1, stone.color, right))
-
-        # print(self.forcedMoves)
         if self.forcedMoves == {}:
             return moves
         else:
@@ -183,31 +169,31 @@ class GameBoard:
         moves = {}
         left = -1
         up = -1
+        turnStays = False
 
+        # For each axis
         for k in range(4):
-            # if True:
-
+            # Get all the tiles on the axis
             tiles = {}
             for i in range(1, 8):
                 newRow = stone.row + up * i
                 newCol = stone.col + left * i
                 if self._isInbounds((newRow, newCol)):
                     tiles[(newRow, newCol)] = (self.GameBoard[newRow][newCol])
+                else:
+                    break
 
             idx = -1
             for tilePos, tile in tiles.items():
                 idx += 1
                 if self._isGamePiece(tile):
-                    # print("stone")
                     if tile.color != stone.color:
                         # enemy
                         if idx + 1 < len(tiles) and list(tiles.values())[idx + 1] == 0:
-                            # print("free")
-                            # empty behind enemy
-                            # forced move
-                            # check if any other jumpable enemy is around -> turn should stay
-                            # else, turn changes
-                            self.forcedMoves[list(tiles)[idx + 1]] = [tile]
+                            # Check if the tile behind enemy is empty
+                            hop = list(tiles.keys())[idx + 1]
+                            self.forcedMoves[hop] = [tile]
+                            turnStays = self._CheckNextHop(hop, tile)
                         else:
                             # not empty
                             break
@@ -221,9 +207,56 @@ class GameBoard:
             if k == 1:
                 up = -up
             left = -left
-        # print(self.forcedMoves)
-        # print(moves)
-        return moves
+
+        return moves, turnStays
+
+    def _CheckNextHop(self, positionToCheck, ignoredStone):
+        # We can only get into this situation by jumping over a stone,
+        # so we can safely ignore that one stone (no ugly loops)
+
+        # Check if there is another stone around
+        # if true, look behind it if there is a 0
+
+        checkRow = positionToCheck[0]
+        checkCol = positionToCheck[1]
+
+        left = -1
+        up = -1
+
+        for k in range(4):
+            # if True:
+
+            tiles = {}
+            for i in range(1, 2):
+                newRow = checkRow + up * i
+                newCol = checkCol + left * i
+                if self._isInbounds((newRow, newCol)):
+                    tiles[(newRow, newCol)] = (self.GameBoard[newRow][newCol])
+
+            if k == 1:
+                up = -up
+            left = -left
+
+            if len(tiles.values()) != 2:
+                # Too short, we're at the edge
+                continue
+
+            if list(tiles.values())[0] == 0:
+                # Empty tile next to positionToCheck
+                continue
+
+            if list(tiles.values())[0] is ignoredStone:
+                continue
+
+            # Safe to assume tile is occupied by a Stone
+            # Check behind it
+            if list(tiles.values())[1] != 0:
+                # Not empty, can't jump the piece
+                continue
+
+            # If we got here, we found a stone with an empty space behind
+            return True
+        return False
 
     def _checkSecondaryJump(self, startPos, color):
         noRecursion = True
