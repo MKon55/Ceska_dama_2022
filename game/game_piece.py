@@ -12,6 +12,7 @@ class GamePiece(ABC):
     def __init__(self, row, col, color):
         self.row = row
         self.col = col
+        self.pos = (row, col)
         self.color = color
         self.x = 0  # x pro col
         self.y = 0  # y pro row

@@ -15,6 +15,8 @@ class GameBoard:
         self.white_left = 12
         self.black_queens = 0
         self.white_queens = 0
+        self.forcedMoves = {}
+        self.blacklistStones = []
         self.CreateGameBoard()
 
     # Metoda vytvoří herní plochu
@@ -82,19 +84,20 @@ class GameBoard:
                     stone.Draw(win)
     #Metoda pro pohyb
     #1. pohyb kamene v listu + 2. update
+
     def Movement(self, stone, row, col):
         # Prohození pozic hodnot; nemusíme vytvářet temp
         self.GameBoard[stone.row][stone.col], self.GameBoard[row][col] = self.GameBoard[row][col], self.GameBoard[stone.row][stone.col]
         stone.Move(row, col)
-        
-        #Kontrola zda jsme na pozici kdy se stone může stát queen + update hodnot self.black_queens a self.white_queens 
-        if row == ROW - 1 or row == 0: #Jestliže jsme na pozici 0 nebo 7 tak jsme na konci či začátku hrací plohcy => kámen se stává dámou 
+
+        #Kontrola zda jsme na pozici kdy se stone může stát queen + update hodnot self.black_queens a self.white_queens
+        if row == ROW - 1 or row == 0:  # Jestliže jsme na pozici 0 nebo 7 tak jsme na konci či začátku hrací plohcy => kámen se stává dámou
             queen = PieceQueen.fromPiece(stone)
             self.GameBoard[queen.row][queen.col] = queen
             if queen.color == BLACK:
                 self.black_queens += 1
-            elif queen.color == WHITE: 
-                self.white_queens += 1     
+            elif queen.color == WHITE:
+                self.white_queens += 1
 
     #Metoda pro stone aby jsme jej mohli předat do movement v main()
     def GetStone(self, row, col):
@@ -129,21 +132,166 @@ class GameBoard:
     #Doublejump rule => Jestliže jsme přeskočili kontrola zda můžeme po diagonále znovu přeskočit
 
     def GetCorrectMoves(self, stone):
+        self.forcedMoves = {}
+        self.blacklistStones = []
         moves = {}  # ukládát pozice (row, col)
-        left = stone.col - 1
-        right = stone.col + 1
         row = stone.row
+        col = stone.col
+        left = col - 1
+        right = col + 1
 
         #Kontrola barvy + PROZATÍM nechávám dámu ve stejném pohybu musíme ještě implementovat specifický pohyb dámy => pohyb po celé diagonále + dáma má přednost!!
-        if stone.color == WHITE or isinstance(stone, PieceQueen):
+        if stone.color == WHITE and isinstance(stone, PieceNormal):
             #Jsme White pohybujeme se nahoru, Jak "hodně nahoru se koukáme"
             moves.update(self._MovementLeft(row - 1, max(row-3, -1), -1, stone.color, left))
             moves.update(self._MovementRight(row - 1, max(row-3, -1), -1, stone.color, right))
 
-        if stone.color == BLACK or isinstance(stone, PieceQueen):
+        if stone.color == BLACK and isinstance(stone, PieceNormal):
             #Nyní se pohybujeme dolů tudíž +1, min()
             moves.update(self._MovementLeft(row + 1, min(row+3, ROW), 1, stone.color, left))
             moves.update(self._MovementRight(row + 1, min(row+3, ROW), 1, stone.color, right))
+
+        if isinstance(stone, PieceQueen):
+            #left = col - 1
+            #right = col + 1
+
+            moves.update(self._QueenMovement(stone))
+
+            # #Movement LEFT -> UP
+            # moves.update(self._MovementLeft(row - 1, max(row-3, -1), -1, stone.color, left))
+            # #Movement LEFT -> DOWN
+            # moves.update(self._MovementLeft(row + 1, min(row+3, ROW), 1, stone.color, left))
+            # #Movement RIGHT -> UP
+            # moves.update(self._MovementRight(row - 1, max(row-3, -1), -1, stone.color, right))
+            # #Movement RIGHT -> DOWN
+            # moves.update(self._MovementRight(row + 1, min(row+3, ROW), 1, stone.color, right))
+
+        # print(self.forcedMoves)
+        if self.forcedMoves == {}:
+            return moves
+        else:
+            return self.forcedMoves
+
+    def _isInbounds(self, pos):
+        return pos[0] >= 0 and pos[0] < ROW and pos[1] >= 0 and pos[1] < COL
+
+    # TODO: Optimize this, so we only check one of the diagonals
+    # returns isMoveValid(boolean), jumpedEnemy(None|Stone)
+    def _isValidQueenMove(self, selectedPos, selectedColor, move):
+        row = selectedPos[0]
+        col = selectedPos[1]
+        color = selectedColor
+
+        leftRight = -1
+        topBottom = -1
+
+        # Loop 4 times for the 4 axis
+        for k in range(4):
+            enemyStone = None
+
+            potentialMove = (row + topBottom, col + leftRight)
+
+            distanceFromSelected = 1
+            while self._isInbounds(potentialMove):
+                GameBoardTile = self.GameBoard[potentialMove[0]][potentialMove[1]]
+                if GameBoardTile != 0:
+                    # occupied tile
+                    if color != GameBoardTile.color:
+                        # Opposite colors
+                        if enemyStone is None:
+                            enemyStone = GameBoardTile
+                        else:
+                            break
+                    else:
+                        # Same color, cant over
+                        break
+
+                # We found location of "move"
+                if potentialMove == move:
+                    if GameBoardTile == 0:
+                        # Empty destination
+                        return True, enemyStone
+                    else:
+                        return False, enemyStone
+
+                distanceFromSelected += 1
+                potentialMove = (row + topBottom * distanceFromSelected, col + leftRight * distanceFromSelected)
+
+            if k % 2 == 1:
+                leftRight = -1
+            else:
+                leftRight = 1
+            if k >= 1:
+                topBottom = 1
+        return False, None
+
+    def _checkSecondaryJump(self, startPos, color):
+        noRecursion = True
+
+        a = -2
+        b = -2
+
+        for i in range(4):
+            Pos = (startPos[0] + a, startPos[1] + b)
+            Valid, Stone = self._isValidQueenMove(startPos, color, Pos)
+
+            if Valid:
+                if Stone is not None:  # and Stone not in self.blacklistStones:
+                    # Go again
+                    self.blacklistStones.append(Stone)
+                    self.forcedMoves[Pos] = []
+                    #self._checkSecondaryJump(Pos, color)
+                    # noRecursion = False
+
+            b = -b
+            if i == 1:
+                a = -a
+
+        if noRecursion:
+            self.forcedMoves[startPos] = []
+
+    def _QueenMovement(self, stone):
+        # go through each diagonal
+        # if its valid move and we are jumping an enemy, check secondaryJump recursively
+        moves = {}
+
+        leftRight = -1
+        topBottom = -1
+
+        # Loop 4 times for the 4 axis
+        for k in range(4):
+
+            potentialMove = (stone.row + leftRight, stone.col + topBottom)
+
+            distanceFromSelected = 1
+            while self._isInbounds(potentialMove):
+                isValid, jumpedStone = self._isValidQueenMove(stone.pos, stone.color, potentialMove)
+                if(jumpedStone is not None):
+                    print(potentialMove, isValid, jumpedStone.pos)
+                else:
+                    print(potentialMove, isValid, jumpedStone)
+                if isValid and jumpedStone is not None:
+                    # CODE RED: The move will jump over an enemy
+                    # check secondaryJump
+                    # if there is no secondaryJump, add this move to forcedMoves
+                    # potentialMove is the new starting location we check fromPiece
+                    self.blacklistStones.append(jumpedStone)
+                    # self._checkSecondaryJump(potentialMove, stone.color)
+                    self.forcedMoves[potentialMove] = []
+                    break
+
+                elif isValid:
+                    moves[potentialMove] = []
+
+                distanceFromSelected += 1
+                potentialMove = (stone.row + leftRight * distanceFromSelected, stone.col + topBottom * distanceFromSelected)
+
+            if k % 2 == 1:
+                leftRight = -1
+            else:
+                leftRight = 1
+            if k == 1:
+                topBottom = 1
 
         return moves
 
@@ -170,7 +318,7 @@ class GameBoard:
                 #Kontrola zda můžeme double or triple
                 if last:
                     if step == -1:
-                        row = max(r-3,-1) #Fix for white double jump 0 -> -1
+                        row = max(r-3, -1)  # Fix for white double jump 0 -> -1
                     else:
                         row = min(r+3, ROW)
 
@@ -213,7 +361,7 @@ class GameBoard:
                 #Kontrola zda můžeme double or triple
                 if last:
                     if step == -1:
-                        row = max(r-3,-1)
+                        row = max(r-3, -1)
                     else:
                         row = min(r+3, ROW)
 
@@ -232,20 +380,20 @@ class GameBoard:
             right += 1
 
         return moves
-        
+
         #Methods for AI
 
         # Game board visualisation for reference
         # [[Stone(), 0, Stone()]
         # [0, Stone(), 0]
         # []]
-        
+
     #Score for AI (better evaluate => better AI) => BLACK is AI, for now (perhaps make it a choise?)
     def evaluate(self):
         return self.black_left - self.white_left + (self.black_queens * 1.5 - self.white_queens * 1.5)
-        #If AI can jump => AI must jump 
-    
-    #Returns the number of stones of a specific colour 
+        #If AI can jump => AI must jump
+
+    #Returns the number of stones of a specific colour
     def get_all_stones(self, color):
         stones = []
         for row in self.GameBoard:
@@ -253,7 +401,7 @@ class GameBoard:
                 if stone != 0 and stone.color == color:
                     stones.append(stone)
         return stones
-        
+
     @property
     def GameBoard(self):
         return self._GameBoard

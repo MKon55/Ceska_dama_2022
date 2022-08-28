@@ -107,6 +107,7 @@ class Gameing:
                 self.board.Remove(skipped)
             #Po provedení pohybu se změní kdo je na tahu -> call turn_change
             self.ChangeTurn()
+            # self.ChangeTurn()
         else:
             return False
 
