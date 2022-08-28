@@ -138,6 +138,7 @@ class GameBoard:
         col = stone.col
         left = col - 1
         right = col + 1
+        turnStays = False
 
         #Kontrola barvy + PROZATÍM nechávám dámu ve stejném pohybu musíme ještě implementovat specifický pohyb dámy => pohyb po celé diagonále + dáma má přednost!!
         if stone.color == WHITE and isinstance(stone, PieceNormal):
@@ -155,9 +156,9 @@ class GameBoard:
             moves.update(queenMoves)
 
         if self.forcedMoves == {}:
-            return moves
+            return moves, turnStays
         else:
-            return self.forcedMoves
+            return self.forcedMoves, turnStays
 
     def _isInbounds(self, pos):
         return pos[0] >= 0 and pos[0] < ROW and pos[1] >= 0 and pos[1] < COL
@@ -194,6 +195,7 @@ class GameBoard:
                             hop = list(tiles.keys())[idx + 1]
                             self.forcedMoves[hop] = [tile]
                             turnStays = self._CheckNextHop(hop, tile)
+                            break
                         else:
                             # not empty
                             break
@@ -227,7 +229,7 @@ class GameBoard:
             # if True:
 
             tiles = {}
-            for i in range(1, 2):
+            for i in range(1, 3):
                 newRow = checkRow + up * i
                 newCol = checkCol + left * i
                 if self._isInbounds((newRow, newCol)):
@@ -240,6 +242,8 @@ class GameBoard:
             if len(tiles.values()) != 2:
                 # Too short, we're at the edge
                 continue
+
+            print(list(tiles.values())[0], list(tiles.values())[1])
 
             if list(tiles.values())[0] == 0:
                 # Empty tile next to positionToCheck

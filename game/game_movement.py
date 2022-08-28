@@ -22,6 +22,7 @@ class Gameing:
         self.saveBtn = Button(WIDTH + 110, HEIGHT - 50, "Uložit Hru", self.SaveButtonAction)
         self.backBtn = Button(WIDTH + 140 + self.saveBtn.rect.width, HEIGHT - 50, "Hlavní Menu", self.BackButtonAction)
         self.buttons = [self.saveBtn, self.backBtn]
+        self.turnStays = False
 
      #Update display, nyní jej nemusíme mít ve main.py
     def Update(self, mouse_pos):
@@ -81,7 +82,8 @@ class Gameing:
         #Jestliže hrací kámen který jsme vybrali existuje a vybrali jsme SVOJI barvu
         if stone != 0 and stone.color == self.turn:
             self.selected_stone = stone
-            self.correct_moves = self.board.GetCorrectMoves(stone)
+            self.correct_moves, self.turnStays = self.board.GetCorrectMoves(stone)
+            print(self.turnStays)
             self.correct_moves[(stone.row, stone.col)] = []  # Shows which piece is selected
             return True  # Výběr a pohyb je správný -> vrátíme True
 
@@ -106,7 +108,9 @@ class Gameing:
             if skipped:
                 self.board.Remove(skipped)
             #Po provedení pohybu se změní kdo je na tahu -> call turn_change
-            self.ChangeTurn()
+            if self.turnStays:
+                self.ChangeTurn()
+                self.turnStays = False
             self.ChangeTurn()
         else:
             return False

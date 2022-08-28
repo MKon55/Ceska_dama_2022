@@ -108,8 +108,7 @@ def Main(loadedGame=None, turn=None, AI=False):
     sys.exit()
 
 
-# MainMenu()
-LoadGame()
+MainMenu()
 #vytvoření "předgui" pro načtení ze souboru .csv nebo začátek nové partie
 #   Něco jako Main menu ve hře
 #   Vedle hracího pole ještě počet herních kamenů, počet dám a jaký hráč je na tahu (převděpodobně na pravé straně okna pygame)
