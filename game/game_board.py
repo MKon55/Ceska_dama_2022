@@ -184,90 +184,46 @@ class GameBoard:
         left = -1
         up = -1
 
-        tiles = {}
-        for i in range(1, 8):
-            newRow = stone.row + up * i
-            newCol = stone.col + left * i
-            if self._isInbounds((newRow, newCol)):
-                tiles[(newRow, newCol)] = (self.GameBoard[newRow][newCol])
-
-        idx = -1
-        for tilePos, tile in tiles.items():
-            idx += 1
-            if self._isGamePiece(tile):
-                print("stone")
-                if tile.color != stone.color:
-                    # enemy
-                    if idx + 1 < len(tiles) and list(tiles.values())[idx + 1] == 0:
-                        print("free")
-                        # empty behind enemy
-                        # forced move
-                        # check if any other jumpable enemy is around -> turn should stay
-                        # else, turn changes
-                        self.forcedMoves[list(tiles)[idx + 1]] = tile
-                    else:
-                        # not empty
-                        break
-                else:
-                    # fren
-                    break
-
-            if tile == 0:
-                moves[tilePos] = []
-
-        print(self.forcedMoves)
-        print(moves)
-        return moves
-
-    # TODO: Optimize this, so we only check one of the diagonals
-    # returns isMoveValid(boolean), jumpedEnemy(None|Stone)
-    def _isValidQueenMove(self, selectedPos, selectedColor, move):
-        row = selectedPos[0]
-        col = selectedPos[1]
-        color = selectedColor
-
-        leftRight = -1
-        topBottom = -1
-
-        # Loop 4 times for the 4 axis
         for k in range(4):
-            enemyStone = None
+            # if True:
 
-            potentialMove = (row + topBottom, col + leftRight)
+            tiles = {}
+            for i in range(1, 8):
+                newRow = stone.row + up * i
+                newCol = stone.col + left * i
+                if self._isInbounds((newRow, newCol)):
+                    tiles[(newRow, newCol)] = (self.GameBoard[newRow][newCol])
 
-            distanceFromSelected = 1
-            while self._isInbounds(potentialMove):
-                GameBoardTile = self.GameBoard[potentialMove[0]][potentialMove[1]]
-                if GameBoardTile != 0:
-                    # occupied tile
-                    if color != GameBoardTile.color:
-                        # Opposite colors
-                        if enemyStone is None:
-                            enemyStone = GameBoardTile
+            idx = -1
+            for tilePos, tile in tiles.items():
+                idx += 1
+                if self._isGamePiece(tile):
+                    # print("stone")
+                    if tile.color != stone.color:
+                        # enemy
+                        if idx + 1 < len(tiles) and list(tiles.values())[idx + 1] == 0:
+                            # print("free")
+                            # empty behind enemy
+                            # forced move
+                            # check if any other jumpable enemy is around -> turn should stay
+                            # else, turn changes
+                            self.forcedMoves[list(tiles)[idx + 1]] = [tile]
                         else:
+                            # not empty
                             break
                     else:
-                        # Same color, cant over
+                        # fren
                         break
 
-                # We found location of "move"
-                if potentialMove == move:
-                    if GameBoardTile == 0:
-                        # Empty destination
-                        return True, enemyStone
-                    else:
-                        return False, enemyStone
+                if tile == 0:
+                    moves[tilePos] = []
 
-                distanceFromSelected += 1
-                potentialMove = (row + topBottom * distanceFromSelected, col + leftRight * distanceFromSelected)
-
-            if k % 2 == 1:
-                leftRight = -1
-            else:
-                leftRight = 1
-            if k >= 1:
-                topBottom = 1
-        return False, None
+            if k == 1:
+                up = -up
+            left = -left
+        # print(self.forcedMoves)
+        # print(moves)
+        return moves
 
     def _checkSecondaryJump(self, startPos, color):
         noRecursion = True
@@ -293,51 +249,6 @@ class GameBoard:
 
         if noRecursion:
             self.forcedMoves[startPos] = []
-
-    def _QueenMovement(self, stone):
-        # go through each diagonal
-        # if its valid move and we are jumping an enemy, check secondaryJump recursively
-        moves = {}
-
-        leftRight = -1
-        topBottom = -1
-
-        # Loop 4 times for the 4 axis
-        for k in range(4):
-
-            distanceFromSelected = 0
-            potentialMove = (stone.row + leftRight * distanceFromSelected, stone.col + topBottom * distanceFromSelected)
-
-            while self._isInbounds(potentialMove):
-                isValid, jumpedStone = self._isValidQueenMove(stone.pos, stone.color, potentialMove)
-                # if(jumpedStone is not None):
-                #     print(potentialMove, isValid, jumpedStone.pos)
-                # else:
-                #     print(potentialMove, isValid, jumpedStone)
-                if isValid and jumpedStone is not None:
-                    # CODE RED: The move will jump over an enemy
-                    # check secondaryJump
-                    # if there is no secondaryJump, add this move to forcedMoves
-                    # potentialMove is the new starting location we check fromPiece
-                    self.blacklistStones.append(jumpedStone)
-                    # self._checkSecondaryJump(potentialMove, stone.color)
-                    self.forcedMoves[potentialMove] = []
-                    break
-
-                elif isValid:
-                    moves[potentialMove] = []
-
-                distanceFromSelected += 1
-                potentialMove = (stone.row + leftRight * distanceFromSelected, stone.col + topBottom * distanceFromSelected)
-
-            if k % 2 == 1:
-                leftRight = -1
-            else:
-                leftRight = 1
-            if k >= 1:
-                topBottom = 1
-
-        return moves
 
     #Pohyb po levé diagonále
     def _MovementLeft(self, start, stop, step, color, left, skipped=[]):  # step určí jakým směrem se pohybujeme, skip určí zda jsme nějakou přeskočili
