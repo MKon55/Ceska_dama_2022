@@ -15,6 +15,7 @@ class GameBoard:
         self.white_left = 12
         self.black_queens = 0
         self.white_queens = 0
+        self.forcedMoves = {}
         self.CreateGameBoard()
 
     # Metoda vytvoří herní plochu
@@ -82,19 +83,20 @@ class GameBoard:
                     stone.Draw(win)
     #Metoda pro pohyb
     #1. pohyb kamene v listu + 2. update
+
     def Movement(self, stone, row, col):
         # Prohození pozic hodnot; nemusíme vytvářet temp
         self.GameBoard[stone.row][stone.col], self.GameBoard[row][col] = self.GameBoard[row][col], self.GameBoard[stone.row][stone.col]
         stone.Move(row, col)
-        
-        #Kontrola zda jsme na pozici kdy se stone může stát queen + update hodnot self.black_queens a self.white_queens 
-        if row == ROW - 1 or row == 0: #Jestliže jsme na pozici 0 nebo 7 tak jsme na konci či začátku hrací plohcy => kámen se stává dámou 
+
+        #Kontrola zda jsme na pozici kdy se stone může stát queen + update hodnot self.black_queens a self.white_queens
+        if row == ROW - 1 or row == 0:  # Jestliže jsme na pozici 0 nebo 7 tak jsme na konci či začátku hrací plohcy => kámen se stává dámou
             queen = PieceQueen.fromPiece(stone)
             self.GameBoard[queen.row][queen.col] = queen
             if queen.color == BLACK:
                 self.black_queens += 1
-            elif queen.color == WHITE: 
-                self.white_queens += 1     
+            elif queen.color == WHITE:
+                self.white_queens += 1
 
     #Metoda pro stone aby jsme jej mohli předat do movement v main()
     def GetStone(self, row, col):
@@ -129,23 +131,141 @@ class GameBoard:
     #Doublejump rule => Jestliže jsme přeskočili kontrola zda můžeme po diagonále znovu přeskočit
 
     def GetCorrectMoves(self, stone):
+        self.forcedMoves = {}
+        self.blacklistStones = []
         moves = {}  # ukládát pozice (row, col)
-        left = stone.col - 1
-        right = stone.col + 1
         row = stone.row
+        col = stone.col
+        left = col - 1
+        right = col + 1
+        turnStays = False
 
         #Kontrola barvy + PROZATÍM nechávám dámu ve stejném pohybu musíme ještě implementovat specifický pohyb dámy => pohyb po celé diagonále + dáma má přednost!!
-        if stone.color == WHITE or isinstance(stone, PieceQueen):
+        if stone.color == WHITE and isinstance(stone, PieceNormal):
             #Jsme White pohybujeme se nahoru, Jak "hodně nahoru se koukáme"
             moves.update(self._MovementLeft(row - 1, max(row-3, -1), -1, stone.color, left))
             moves.update(self._MovementRight(row - 1, max(row-3, -1), -1, stone.color, right))
 
-        if stone.color == BLACK or isinstance(stone, PieceQueen):
+        if stone.color == BLACK and isinstance(stone, PieceNormal):
             #Nyní se pohybujeme dolů tudíž +1, min()
             moves.update(self._MovementLeft(row + 1, min(row+3, ROW), 1, stone.color, left))
             moves.update(self._MovementRight(row + 1, min(row+3, ROW), 1, stone.color, right))
 
-        return moves
+        if isinstance(stone, PieceQueen):
+            queenMoves, turnStays = self._GetQueenMoves(stone)
+            moves.update(queenMoves)
+
+        if self.forcedMoves == {}:
+            return moves, turnStays
+        else:
+            return self.forcedMoves, turnStays
+
+    def _isInbounds(self, pos):
+        return pos[0] >= 0 and pos[0] < ROW and pos[1] >= 0 and pos[1] < COL
+
+    def _isGamePiece(self, tile):
+        return isinstance(tile, PieceNormal) or isinstance(tile, PieceQueen)
+
+    def _GetQueenMoves(self, stone):
+        moves = {}
+        left = -1
+        up = -1
+        turnStays = False
+
+        # For each axis
+        for k in range(4):
+            # Get all the tiles on the axis
+            tiles = {}
+            for i in range(1, 8):
+                newRow = stone.row + up * i
+                newCol = stone.col + left * i
+                if self._isInbounds((newRow, newCol)):
+                    tiles[(newRow, newCol)] = (self.GameBoard[newRow][newCol])
+                else:
+                    break
+
+            idx = -1
+            for tilePos, tile in tiles.items():
+                idx += 1
+                if self._isGamePiece(tile):
+                    if tile.color != stone.color:
+                        # enemy
+                        if idx + 1 < len(tiles) and list(tiles.values())[idx + 1] == 0:
+                            # Check if the tile behind enemy is empty
+                            hop = list(tiles.keys())[idx + 1]
+                            self.forcedMoves[hop] = [tile]
+                            # IF there are more options, one of them might be false, but a later one will be true, ovverriding the false and letting you move even if you shouldnt
+                            # Should fix itself with a tree
+                            turnStays = self._CheckNextHop(hop, tile)
+                            # print("checked", turnStays)
+                            break
+                        else:
+                            # not empty
+                            break
+                    else:
+                        # fren
+                        break
+
+                if tile == 0:
+                    moves[tilePos] = []
+
+            if k == 1:
+                up = -up
+            left = -left
+
+        return moves, turnStays
+
+    def _CheckNextHop(self, positionToCheck, ignoredStone):
+        # We can only get into this situation by jumping over a stone,
+        # so we can safely ignore that one stone (no ugly loops)
+
+        # Check if there is another stone around
+        # if true, look behind it if there is a 0
+
+        checkRow = positionToCheck[0]
+        checkCol = positionToCheck[1]
+
+        left = -1
+        up = -1
+
+        for k in range(4):
+            # if True:
+
+            tiles = {}
+            for i in range(1, 3):
+                newRow = checkRow + up * i
+                newCol = checkCol + left * i
+                if self._isInbounds((newRow, newCol)):
+                    tiles[(newRow, newCol)] = (self.GameBoard[newRow][newCol])
+
+            if k == 1:
+                up = -up
+            left = -left
+
+            if len(tiles.values()) != 2:
+                # Too short, we're at the edge
+                continue
+
+            if list(tiles.values())[0] == 0:
+                # Empty tile next to positionToCheck
+                continue
+
+            if list(tiles.values())[0] is ignoredStone:
+                continue
+
+            # Safe to assume tile is occupied by a Stone
+            # Check friendly stone
+            if list(tiles.values())[0].color != ignoredStone.color:
+                continue
+
+            # Check behind it
+            if list(tiles.values())[1] != 0:
+                # Not empty, can't jump the piece
+                continue
+
+            # If we got here, we found a stone with an empty space behind
+            return True
+        return False
 
     #Pohyb po levé diagonále
     def _MovementLeft(self, start, stop, step, color, left, skipped=[]):  # step určí jakým směrem se pohybujeme, skip určí zda jsme nějakou přeskočili
@@ -170,7 +290,7 @@ class GameBoard:
                 #Kontrola zda můžeme double or triple
                 if last:
                     if step == -1:
-                        row = max(r-3,-1) #Fix for white double jump 0 -> -1
+                        row = max(r-3, -1)  # Fix for white double jump 0 -> -1
                     else:
                         row = min(r+3, ROW)
 
@@ -213,7 +333,7 @@ class GameBoard:
                 #Kontrola zda můžeme double or triple
                 if last:
                     if step == -1:
-                        row = max(r-3,-1)
+                        row = max(r-3, -1)
                     else:
                         row = min(r+3, ROW)
 
@@ -232,20 +352,20 @@ class GameBoard:
             right += 1
 
         return moves
-        
+
         #Methods for AI
 
         # Game board visualisation for reference
         # [[Stone(), 0, Stone()]
         # [0, Stone(), 0]
         # []]
-        
+
     #Score for AI (better evaluate => better AI) => BLACK is AI, for now (perhaps make it a choise?)
     def evaluate(self):
         return self.black_left - self.white_left + (self.black_queens * 1.5 - self.white_queens * 1.5)
-        #If AI can jump => AI must jump 
-    
-    #Returns the number of stones of a specific colour 
+        #If AI can jump => AI must jump
+
+    #Returns the number of stones of a specific colour
     def get_all_stones(self, color):
         stones = []
         for row in self.GameBoard:
@@ -253,7 +373,7 @@ class GameBoard:
                 if stone != 0 and stone.color == color:
                     stones.append(stone)
         return stones
-        
+
     @property
     def GameBoard(self):
         return self._GameBoard
