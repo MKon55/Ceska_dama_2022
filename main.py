@@ -38,11 +38,12 @@ def StartAi():
 
 # Start the game from a .csv file
 def LoadGame(AI=False):
-    pathToFile = game.file_picker.FilePicker()
-    if pathToFile is None:
-        return
-    loadedGame, turn = FileManager().ReadFile(pathToFile)
-    Main(loadedGame, turn, AI=AI)
+    # pathToFile = game.file_picker.FilePicker()
+    # if pathToFile is None:
+    #     return
+    # loadedGame, turn = FileManager().ReadFile(pathToFile)
+    Main([['c3', 'ww'], ['c7', 'bb']], (198, 25, 44), AI=AI)
+    # Main(loadedGame, turn, AI=AI)
 
 
 # Load the game and play against ai
@@ -71,7 +72,7 @@ def Main(loadedGame=None, turn=None, AI=False):
 
     # Load a game if we get a board
     if loadedGame is not None:
-        game.board.LoadBoard(loadedGame)
+        game.LoadBoard(loadedGame)
         game.SetTurn(turn)
 
     while game_running:
@@ -108,7 +109,10 @@ def Main(loadedGame=None, turn=None, AI=False):
     sys.exit()
 
 
-MainMenu()
+# MainMenu()
+LoadGame()
+
+
 #vytvoření "předgui" pro načtení ze souboru .csv nebo začátek nové partie
 #   Něco jako Main menu ve hře
 #   Vedle hracího pole ještě počet herních kamenů, počet dám a jaký hráč je na tahu (převděpodobně na pravé straně okna pygame)

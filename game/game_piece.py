@@ -14,6 +14,7 @@ class GamePiece(ABC):
         self.col = col
         self.pos = (row, col)
         self.color = color
+        self.selected = False
         self.x = 0  # x pro col
         self.y = 0  # y pro row
         self.CalcPos()
@@ -33,6 +34,7 @@ class GamePiece(ABC):
     def Move(self, row, col):
         self.row = row
         self.col = col
+        self.pos = (row, col)
         self.CalcPos()  # Přepočítání aby byl kámen přesunut na prostředek čtverce
 
     # Metoda vykreslí hrací kámen

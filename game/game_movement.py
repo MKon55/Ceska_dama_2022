@@ -11,6 +11,7 @@ from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG
 from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
 from game.game_board import GameBoard
 from game.button import Button
+from game.tree import Tree
 
 
 class Gameing:
@@ -26,6 +27,12 @@ class Gameing:
 
      #Update display, nyní jej nemusíme mít ve main.py
     def Update(self, mouse_pos):
+        if self.selecting:
+            # print(self.tree._PrintBoard(self.board.GameBoard))
+            self.tree.AddSelectableStones(self.board, self.turn)
+            self.selecting = False
+            self.moving = False
+
         self.board.Draw(self.win)
 
         sidebar = pygame.Rect(WIDTH, 0, WINDOW_WIDTH - WIDTH, WINDOW_HEIGHT)
@@ -36,7 +43,10 @@ class Gameing:
             btn.hover(mouse_pos)
             btn.draw(self.win)
 
+        # if self.moving:
         self.DrawCorrectMoves(self.correct_moves)
+        # self.DrawCorrectMoves(self.tree.GetPossibleMoves(self.board.GameBoard))
+
         pygame.display.update()
 
         # Tell main that the game should stop
@@ -49,6 +59,16 @@ class Gameing:
         self.turn = Gameing.turn  # Tah začíná z pravidla bílí
         self.correct_moves = {}  # Ukaže možné správné pohyby pro daného hráče
         self.game_running = True  # Flag for main, doesnt actually control if game is running, that's main's job
+        self._SetTree()
+
+    def LoadBoard(self, board):
+        self.board.LoadBoard(board)
+        self._SetTree()
+
+    def _SetTree(self):
+        self.tree = Tree(self.board)
+        self.selecting = True
+        self.moving = False
 
     def GameWinner(self):
         return self.board.Winner()
@@ -71,17 +91,29 @@ class Gameing:
             return False
 
         if self.selected_stone:
-            result = self._Move(row, col)
-            #Jestliže náš pohyb není validní tak pohyb nebude proveden a znovu zavoláme metodu Select
+            result, turnChange = self.tree.Move((row, col))
+            # result = self._Move(row, col)
+            # #Jestliže náš pohyb není validní tak pohyb nebude proveden a znovu zavoláme metodu Select
             if not result:
+                self.selected_stone.selected = False
                 self.selected_stone = None
+                self.tree.UnselectNode()
+                self.moving = False
                 self.correct_moves = {}  # Clear the moves when piece is deselected
                 self.Select(row, col, pos)
+                return False
+            else:
+                self.selecting = True
+                if turnChange:
+                    self.ChangeTurn()
 
         stone = self.board.GetStone(row, col)
         #Jestliže hrací kámen který jsme vybrali existuje a vybrali jsme SVOJI barvu
         if stone != 0 and stone.color == self.turn:
             self.selected_stone = stone
+            stone.selected = True
+            self.tree.SelectNode(self.board.GameBoard)
+            self.moving = True
             self.correct_moves, self.turnStays = self.board.GetCorrectMoves(stone)
             self.correct_moves[(stone.row, stone.col)] = []  # Shows which piece is selected
             return True  # Výběr a pohyb je správný -> vrátíme True

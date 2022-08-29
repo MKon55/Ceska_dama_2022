@@ -138,7 +138,7 @@ class GameBoard:
         col = stone.col
         left = col - 1
         right = col + 1
-        turnStays = False
+        turnStays = {}
 
         #Kontrola barvy + PROZATÍM nechávám dámu ve stejném pohybu musíme ještě implementovat specifický pohyb dámy => pohyb po celé diagonále + dáma má přednost!!
         if stone.color == WHITE and isinstance(stone, PieceNormal):
@@ -152,7 +152,8 @@ class GameBoard:
             moves.update(self._MovementRight(row + 1, min(row+3, ROW), 1, stone.color, right))
 
         if isinstance(stone, PieceQueen):
-            queenMoves, turnStays = self._GetQueenMoves(stone)
+            queenMoves, turnStaysQueen = self._GetQueenMoves(stone)
+            turnStays.update({"turn": turnStaysQueen})
             moves.update(queenMoves)
 
         if self.forcedMoves == {}:
