@@ -194,7 +194,10 @@ class GameBoard:
                             # Check if the tile behind enemy is empty
                             hop = list(tiles.keys())[idx + 1]
                             self.forcedMoves[hop] = [tile]
+                            # IF there are more options, one of them might be false, but a later one will be true, ovverriding the false and letting you move even if you shouldnt
+                            # Should fix itself with a tree
                             turnStays = self._CheckNextHop(hop, tile)
+                            # print("checked", turnStays)
                             break
                         else:
                             # not empty
@@ -263,31 +266,6 @@ class GameBoard:
             # If we got here, we found a stone with an empty space behind
             return True
         return False
-
-    def _checkSecondaryJump(self, startPos, color):
-        noRecursion = True
-
-        a = -2
-        b = -2
-
-        for i in range(4):
-            Pos = (startPos[0] + a, startPos[1] + b)
-            Valid, Stone = self._isValidQueenMove(startPos, color, Pos)
-
-            if Valid:
-                if Stone is not None:  # and Stone not in self.blacklistStones:
-                    # Go again
-                    self.blacklistStones.append(Stone)
-                    self.forcedMoves[Pos] = []
-                    #self._checkSecondaryJump(Pos, color)
-                    # noRecursion = False
-
-            b = -b
-            if i == 1:
-                a = -a
-
-        if noRecursion:
-            self.forcedMoves[startPos] = []
 
     #Pohyb po levé diagonále
     def _MovementLeft(self, start, stop, step, color, left, skipped=[]):  # step určí jakým směrem se pohybujeme, skip určí zda jsme nějakou přeskočili
