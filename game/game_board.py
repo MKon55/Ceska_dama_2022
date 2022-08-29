@@ -132,24 +132,13 @@ class GameBoard:
 
     def GetCorrectMoves(self, stone):
         self.forcedMoves = {}
-        self.blacklistStones = []
         moves = {}  # ukládát pozice (row, col)
-        row = stone.row
-        col = stone.col
-        left = col - 1
-        right = col + 1
-        turnStays = {}
+        turnStays = {}  # Saves the same number of items as moves, decides if the turn should change/stay
 
-        #Kontrola barvy + PROZATÍM nechávám dámu ve stejném pohybu musíme ještě implementovat specifický pohyb dámy => pohyb po celé diagonále + dáma má přednost!!
-        if stone.color == WHITE and isinstance(stone, PieceNormal):
-            #Jsme White pohybujeme se nahoru, Jak "hodně nahoru se koukáme"
-            moves.update(self._MovementLeft(row - 1, max(row-3, -1), -1, stone.color, left))
-            moves.update(self._MovementRight(row - 1, max(row-3, -1), -1, stone.color, right))
-
-        if stone.color == BLACK and isinstance(stone, PieceNormal):
-            #Nyní se pohybujeme dolů tudíž +1, min()
-            moves.update(self._MovementLeft(row + 1, min(row+3, ROW), 1, stone.color, left))
-            moves.update(self._MovementRight(row + 1, min(row+3, ROW), 1, stone.color, right))
+        if isinstance(stone, PieceNormal):
+            pieceMoves, turnStaysPiece = self._GetPieceMoves(stone)
+            turnStays.update({"turn": turnStaysPiece})
+            moves.update(pieceMoves)
 
         if isinstance(stone, PieceQueen):
             queenMoves, turnStaysQueen = self._GetQueenMoves(stone)
@@ -166,6 +155,68 @@ class GameBoard:
 
     def _isGamePiece(self, tile):
         return isinstance(tile, PieceNormal) or isinstance(tile, PieceQueen)
+
+    def _GetPieceMoves(self, stone):
+        moves = {}
+        turnStays = False
+
+        # Starts movement left up
+        if stone.color == WHITE:
+            left = -1
+            up = -1
+
+        # Starts movement left down
+        if stone.color == BLACK:
+            left = -1
+            up = 1
+
+        # For each axis
+        for k in range(2):
+            # Get all the tiles on the axis
+
+            # Movement for right up
+            if stone.color == WHITE and k == 1:
+                left += 2
+
+            # Movement for right down
+            if stone.color == BLACK and k == 1:
+                up += 2
+
+            tiles = {}
+            for i in range(1, 2):
+                newRow = stone.row + up * i
+                newCol = stone.col + left * i
+                if self._isInbounds((newRow, newCol)):
+                    tiles[(newRow, newCol)] = (self.GameBoard[newRow][newCol])
+                else:
+                    break
+
+            idx = -1
+            for tilePos, tile in tiles.items():
+                idx += 1
+                if self._isGamePiece(tile):
+                    if tile.color != stone.color:
+                        # enemy
+                        if idx + 1 < len(tiles) and list(tiles.values())[idx + 1] == 0:
+                            # Check if the tile behind enemy is empty
+                            hop = list(tiles.keys())[idx + 1]
+                            self.forcedMoves[hop] = [tile]
+                            # IF there are more options, one of them might be false, but a later one will be true, ovverriding the false and letting you move even if you shouldnt
+                            # Should fix itself with a tree
+                            turnStays = self._CheckNextHop(hop, tile)
+                            # print("checked", turnStays)
+                            break
+                        else:
+                            # not empty
+                            break
+                    else:
+                        # fren
+                        break
+
+                if tile == 0:
+                    moves[tilePos] = []
+
+        return moves, turnStays
 
     def _GetQueenMoves(self, stone):
         moves = {}
@@ -267,92 +318,6 @@ class GameBoard:
             # If we got here, we found a stone with an empty space behind
             return True
         return False
-
-    #Pohyb po levé diagonále
-    def _MovementLeft(self, start, stop, step, color, left, skipped=[]):  # step určí jakým směrem se pohybujeme, skip určí zda jsme nějakou přeskočili
-        moves = {}
-        last = []
-        for r in range(start, stop, step):
-            if left < 0:  # Jestliže koumáme již mimo hrací pole
-                break
-
-            #Traversování do levé strany
-            current = self.GameBoard[r][left]
-            #Pokud == 0 tak jsme našli prazdné pole do kterého se můžeme hýbnout
-            if current == 0:
-                if skipped and not last:
-                    break  # Jestliže jsme přeskočili a již nemůžeme nic jiného přeskočit tak už se nemůžeme hýbat
-                elif skipped:
-                    moves[(r, left)] = last + skipped  # Toto určuje potom co jsme přeskočili jaké kameny máme odstranit ze hry
-                #Pukud splněnuje předchozí tak jej můžeme přeskočit
-                else:
-                    moves[(r, left)] = last
-
-                #Kontrola zda můžeme double or triple
-                if last:
-                    if step == -1:
-                        row = max(r-3, -1)  # Fix for white double jump 0 -> -1
-                    else:
-                        row = min(r+3, ROW)
-
-                    #Rekalkulace jestliže jsme skočili a nyní můžeme double or triple
-                    moves.update(self._MovementLeft(r+step, row, step, color, left-1, skipped=last))
-                    moves.update(self._MovementRight(r+step, row, step, color, left+1, skipped=last))
-                break  # Pro jistotu aby byl pohyb zastaven po double or triple
-
-            #Pokud poli je hrací kámen který je stejné barvy tak se tam nemůžeme hýbnout
-            elif current.color == color:
-                break
-            #Pokud to není naší barvy tak je to protihráčovo kámen a můžeme se hýbnout S TÍM  že předpokládáme že za ní je prázdné pole
-            else:
-                last = [current]
-
-            left -= 1
-
-        return moves
-
-    #Pohyb po pravé diagonále
-    def _MovementRight(self, start, stop, step, color, right, skipped=[]):
-        moves = {}
-        last = []
-        for r in range(start, stop, step):
-            if right >= COL:  # Jestliže koumáme již mimo hrací pole
-                break
-
-            #Traversování do pravé strany
-            current_move = self.GameBoard[r][right]
-            #Pokud == 0 tak jsme našli prazdné pole do kterého se můžeme hýbnout
-            if current_move == 0:
-                if skipped and not last:
-                    break  # Jestliže jsme přeskočili a již nemůžeme nic jiného přeskočit tak už se nemůžeme hýbat
-                elif skipped:
-                    moves[(r, right)] = last + skipped  # Toto určuje potom co jsme přeskočili jaké kameny máme odstranit ze hry
-                #Pukud splněnuje předchozí tak jej můžeme přeskočit
-                else:
-                    moves[(r, right)] = last
-
-                #Kontrola zda můžeme double or triple
-                if last:
-                    if step == -1:
-                        row = max(r-3, -1)
-                    else:
-                        row = min(r+3, ROW)
-
-                    #Rekalkulace jestliže jsme skočili a nyní můžeme double or triple
-                    moves.update(self._MovementLeft(r+step, row, step, color, right-1, skipped=last))
-                    moves.update(self._MovementRight(r+step, row, step, color, right+1, skipped=last))
-                break  # Pro jistotu aby byl pohyb zastaven po double or triple
-
-            #Pokud poli je hrací kámen který je stejné barvy tak se tam nemůžeme hýbnout
-            elif current_move.color == color:
-                break
-            #Pokud to není naší barvy tak je to protihráčovo kámen a můžeme se hýbnout S TÍM  že předpokládáme že za ní je prázdné pole
-            else:
-                last = [current_move]
-
-            right += 1
-
-        return moves
 
         #Methods for AI
 

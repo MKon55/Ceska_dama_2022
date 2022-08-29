@@ -83,7 +83,6 @@ class Tree:
         )
 
     def Move(self, move):
-        print(self.lastSelected)
         if self.lastSelected is None:
             return False, False
         board = self._GetBoardWithMove(self.lastSelected.data, move)
