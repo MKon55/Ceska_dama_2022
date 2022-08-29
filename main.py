@@ -38,13 +38,13 @@ def StartAi():
 
 # Start the game from a .csv file
 def LoadGame(AI=False):
-    # pathToFile = game.file_picker.FilePicker()
-    # if pathToFile is None:
-    #     return
-    # loadedGame, turn = FileManager().ReadFile(pathToFile)
-    # Main([['c3', 'w'], ['c5', 'b']], (198, 25, 44), AI=AI)
-    Main([['c3', 'ww'], ['c5', 'bb']], (198, 25, 44), AI=AI)
-    # Main(loadedGame, turn, AI=AI)
+    pathToFile = game.file_picker.FilePicker()
+    if pathToFile is None:
+        return
+    loadedGame, turn = FileManager().ReadFile(pathToFile)
+    # Main([['c3', 'ww'], ['c5', 'bb']], (198, 25, 44), AI=AI)
+    # Main([['c3', 'w'], ['d4', 'b'], ['f4', 'b']], (198, 25, 44), AI=AI)
+    Main(loadedGame, turn, AI=AI)
 
 
 # Load the game and play against ai
@@ -110,8 +110,8 @@ def Main(loadedGame=None, turn=None, AI=False):
     sys.exit()
 
 
-# MainMenu()
-LoadGame()
+MainMenu()
+# LoadGame()
 
 
 #vytvoření "předgui" pro načtení ze souboru .csv nebo začátek nové partie

@@ -7,7 +7,7 @@ import copy
 
 class Tree:
     def __init__(self, headData):
-        self.head = Node(None, headData, False)
+        self.head = Node(None, headData, False, None)
         self.lastMove = self.head
         self.lastSelected = None
         self.boardReference = None
@@ -27,7 +27,7 @@ class Tree:
                         if len(moves) != 0:
                             selectedBoard = copy.deepcopy(board.GameBoard)
                             selectedBoard[row][col].selected = True
-                            selectable = Node(self.lastMove, selectedBoard, False)
+                            selectable = Node(self.lastMove, selectedBoard, False, None)
                             self.lastMove.AddChild(selectable)
                             idx = -1
                             for move, killedPiece in moves.items():
@@ -37,7 +37,17 @@ class Tree:
                                 moveBoard[moveRow][moveCol] = moveBoard[row][col]
                                 moveBoard[row][col] = 0
                                 moveBoard[moveRow][moveCol].Move(moveRow, moveCol)
-                                moveNode = Node(selectable, moveBoard, True)
+                                kp = None
+                                if len(killedPiece) == 1:
+                                    kp = killedPiece[0].pos
+                                    # killRow, killCol = kp
+                                    # moveBoard[killRow][killCol] = 0
+
+                                # No turnstays, assume we should change turn
+                                turnBool = True
+                                if len(turnStays) != 0:
+                                    turnBool = not list(turnStays.values())[idx]
+                                moveNode = Node(selectable, moveBoard, turnBool, kp)
                                 selectable.AddChild(moveNode)
                                 # Once the GetCorrectMoves is changed to return one killedPiece
                                 # Add code to remove piece from here
@@ -92,6 +102,8 @@ class Tree:
             testBoard = moveNode.data
             if self._AreBoardsIdentical(board, testBoard):
                 self.lastMove = moveNode
+                if moveNode.killedPiece is not None:
+                    moveNode.data = self._GetBoardWithKill(moveNode)
                 self.boardReference.GameBoard = moveNode.data
                 return True, moveNode.turnChange
         return False, False
@@ -108,6 +120,13 @@ class Tree:
             boardCopy[selRow][selCol] = 0
             return boardCopy
         return None
+
+    def _GetBoardWithKill(self, node):
+        if node.killedPiece is not None:
+            board = copy.deepcopy(node.data)
+            killRow, killCol = node.killedPiece
+            board[killRow][killCol] = 0
+            return board
 
     def _GetSelectedStone(self, board):
         for row in range(ROW):

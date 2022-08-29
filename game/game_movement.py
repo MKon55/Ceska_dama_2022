@@ -164,7 +164,6 @@ class Gameing:
         self.correct_moves = {}  # Odstraní zelené možnosti po našem tahu
         self.turn = BLACK if self.turn == WHITE else WHITE
         Gameing.turn = self.turn
-        print("turn changed")
 
     def SetTurn(self, color):
         self.turn = color

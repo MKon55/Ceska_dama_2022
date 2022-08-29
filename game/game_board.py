@@ -132,6 +132,7 @@ class GameBoard:
 
     def GetCorrectMoves(self, stone):
         self.forcedMoves = {}
+        self.turnStays = {}
         moves = {}  # ukládát pozice (row, col)
         turnStays = {}  # Saves the same number of items as moves, decides if the turn should change/stay
 
@@ -141,8 +142,8 @@ class GameBoard:
             moves.update(pieceMoves)
 
         if isinstance(stone, PieceQueen):
-            queenMoves, turnStaysQueen = self._GetQueenMoves(stone)
-            turnStays.update({"turn": turnStaysQueen})
+            queenMoves = self._GetQueenMoves(stone)
+            turnStays.update(self.turnStays)
             moves.update(queenMoves)
 
         if self.forcedMoves == {}:
@@ -218,7 +219,6 @@ class GameBoard:
         moves = {}
         left = -1
         up = -1
-        turnStays = False
 
         # For each axis
         for k in range(4):
@@ -244,7 +244,7 @@ class GameBoard:
                             self.forcedMoves[hop] = [tile]
                             # IF there are more options, one of them might be false, but a later one will be true, ovverriding the false and letting you move even if you shouldnt
                             # Should fix itself with a tree
-                            turnStays = self._CheckNextHop(hop, tile)
+                            self.turnStays[hop] = self._CheckNextHop(hop, tile)
                             # print("checked", turnStays)
                             break
                         else:
@@ -261,7 +261,7 @@ class GameBoard:
                 up = -up
             left = -left
 
-        return moves, turnStays
+        return moves
 
     def _CheckNextHop(self, positionToCheck, ignoredStone):
         # We can only get into this situation by jumping over a stone,
@@ -270,8 +270,7 @@ class GameBoard:
         # Check if there is another stone around
         # if true, look behind it if there is a 0
 
-        checkRow = positionToCheck[0]
-        checkCol = positionToCheck[1]
+        checkRow, checkCol = positionToCheck
 
         left = -1
         up = -1
