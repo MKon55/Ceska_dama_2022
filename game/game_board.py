@@ -243,8 +243,6 @@ class GameBoard:
                 # Too short, we're at the edge
                 continue
 
-            print(list(tiles.values())[0], list(tiles.values())[1])
-
             if list(tiles.values())[0] == 0:
                 # Empty tile next to positionToCheck
                 continue
@@ -253,6 +251,10 @@ class GameBoard:
                 continue
 
             # Safe to assume tile is occupied by a Stone
+            # Check friendly stone
+            if list(tiles.values())[0].color != ignoredStone.color:
+                continue
+
             # Check behind it
             if list(tiles.values())[1] != 0:
                 # Not empty, can't jump the piece

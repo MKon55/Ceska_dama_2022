@@ -83,7 +83,6 @@ class Gameing:
         if stone != 0 and stone.color == self.turn:
             self.selected_stone = stone
             self.correct_moves, self.turnStays = self.board.GetCorrectMoves(stone)
-            print(self.turnStays)
             self.correct_moves[(stone.row, stone.col)] = []  # Shows which piece is selected
             return True  # Výběr a pohyb je správný -> vrátíme True
 
