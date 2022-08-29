@@ -175,13 +175,9 @@ class GameBoard:
             # Get all the tiles on the axis
 
             # Movement for right up
-            if stone.color == WHITE and k == 1:
+            if  k == 1:
                 left += 2
-
-            # Movement for right down
-            if stone.color == BLACK and k == 1:
-                up += 2
-
+                
             tiles = {}
             for i in range(1, 2):
                 newRow = stone.row + up * i
