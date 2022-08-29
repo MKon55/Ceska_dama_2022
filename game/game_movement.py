@@ -94,18 +94,19 @@ class Gameing:
             result, turnChange = self.tree.Move((row, col))
             # result = self._Move(row, col)
             # #Jestliže náš pohyb není validní tak pohyb nebude proveden a znovu zavoláme metodu Select
-            if not result:
-                self.selected_stone.selected = False
-                self.selected_stone = None
-                self.tree.UnselectNode()
-                self.moving = False
-                self.correct_moves = {}  # Clear the moves when piece is deselected
+            self.selected_stone.selected = False
+            self.selected_stone = None
+            self.tree.UnselectNode()
+            self.moving = False
+            self.correct_moves = {}  # Clear the moves when piece is deselected
+            if result is False:
                 self.Select(row, col, pos)
                 return False
-            else:
+            elif result is True:
                 self.selecting = True
                 if turnChange:
                     self.ChangeTurn()
+                return True
 
         stone = self.board.GetStone(row, col)
         #Jestliže hrací kámen který jsme vybrali existuje a vybrali jsme SVOJI barvu
@@ -163,6 +164,7 @@ class Gameing:
         self.correct_moves = {}  # Odstraní zelené možnosti po našem tahu
         self.turn = BLACK if self.turn == WHITE else WHITE
         Gameing.turn = self.turn
+        print("turn changed")
 
     def SetTurn(self, color):
         self.turn = color

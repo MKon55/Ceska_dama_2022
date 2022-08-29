@@ -42,7 +42,8 @@ def LoadGame(AI=False):
     # if pathToFile is None:
     #     return
     # loadedGame, turn = FileManager().ReadFile(pathToFile)
-    Main([['c3', 'w'], ['c7', 'b']], (198, 25, 44), AI=AI)
+    # Main([['c3', 'w'], ['c5', 'b']], (198, 25, 44), AI=AI)
+    Main([['c3', 'ww'], ['c5', 'bb']], (198, 25, 44), AI=AI)
     # Main(loadedGame, turn, AI=AI)
 
 

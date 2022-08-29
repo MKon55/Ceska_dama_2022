@@ -175,11 +175,11 @@ class GameBoard:
             # Get all the tiles on the axis
 
             # Movement for right up
-            if  k == 1:
-                left += 2
-                
+            if k == 1:
+                left = -left
+
             tiles = {}
-            for i in range(1, 2):
+            for i in range(1, 3):
                 newRow = stone.row + up * i
                 newCol = stone.col + left * i
                 if self._isInbounds((newRow, newCol)):
@@ -209,7 +209,7 @@ class GameBoard:
                         # fren
                         break
 
-                if tile == 0:
+                if tile == 0 and idx < 1:
                     moves[tilePos] = []
 
         return moves, turnStays
