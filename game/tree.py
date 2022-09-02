@@ -1,4 +1,4 @@
-from game.stat_values import ROW, COL
+from game.stat_values import ROW, COL, WHITE, BLACK
 from game.tree_node import Node
 from game.piece_normal import PieceNormal
 from game.piece_queen import PieceQueen
@@ -74,7 +74,6 @@ class Tree:
             for i in range(ROW):
                 for j in range(COL):
                     if board[i][j] != 0:
-                        from game.stat_values import WHITE
                         if board[i][j].color == WHITE:
                             s += "\033[91m"
                         else:
@@ -116,18 +115,37 @@ class Tree:
         for moveNode in self.lastSelected.children:
             testBoard = moveNode.data
             if self._AreBoardsIdentical(board, testBoard):
+                moveSelected = self._GetSelectedStone(moveNode.data)
+                # Check for queen upgrade
+                moveNode.data = self._UpgradeQueen(moveNode.data, moveSelected)
                 # Unselect moved piece
-                moveNode.data = self._DeselecPiece(moveNode.data)
+                moveNode.data = self._DeselectPiece(moveNode.data, moveSelected)
+
                 self.lastMove = moveNode
+                # If a piece was killed, remove it
                 if moveNode.killedPiece is not None:
                     moveNode.data = self._GetBoardWithKill(moveNode)
                 self.boardReference.GameBoard = moveNode.data
                 return True, moveNode.turnChange
         return False, False
 
-    def _DeselecPiece(self, board):
-        moveSelected = self._GetSelectedStone(board)
-        board[moveSelected.row][moveSelected.col].selected = False
+    def _UpgradeQueen(self, board, selected):
+        if isinstance(selected, PieceNormal):
+            if selected.row == 0 or selected.row == ROW - 1:
+                queen = PieceQueen.fromPiece(selected)
+                board[queen.row][queen.col] = queen
+            # if selected.color == WHITE and selected.row == 0:
+            #     # normal white piece at the top edge
+            #     queen = PieceQueen.fromPiece(selected)
+            #     board[queen.row][queen.col] = queen
+            # if selected.color == BLACK and selected.row == ROW - 1:
+            #     # normal black piece at the bottom edge
+            #     queen = PieceQueen.fromPiece(selected)
+            #     board[queen.row][queen.col] = queen
+        return board
+
+    def _DeselectPiece(self, board, selected):
+        board[selected.row][selected.col].selected = False
         return board
 
     def _GetBoardWithMove(self, board, move):
