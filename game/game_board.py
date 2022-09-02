@@ -86,17 +86,6 @@ class GameBoard:
     def GetStone(self, row, col):
         return self.GameBoard[row][col]
 
-    #Odstranění hracího kamene jesliže byl přeskočen
-    def Remove(self, stones):
-        for stone in stones:
-            self.GameBoard[stone.row][stone.col] = 0
-            #Pokud byl hrací kámen přeskočen jest odstraněn ze počtu celkových hracích kamenů
-            if stone != 0:
-                if stone.color == WHITE:
-                    self.white_left -= 1
-                else:
-                    self.black_left -= 1
-
     #Metoda vrátí barvu vítěze, prozatím takto jeduduché ve
     def Winner(self):
         if self.white_left <= 0:
