@@ -137,8 +137,8 @@ class GameBoard:
         turnStays = {}  # Saves the same number of items as moves, decides if the turn should change/stay
 
         if isinstance(stone, PieceNormal):
-            pieceMoves, turnStaysPiece = self._GetPieceMoves(stone)
-            turnStays.update({"turn": turnStaysPiece})
+            pieceMoves = self._GetPieceMoves(stone)
+            turnStays.update(self.turnStays)
             moves.update(pieceMoves)
 
         if isinstance(stone, PieceQueen):
@@ -200,7 +200,7 @@ class GameBoard:
                             self.forcedMoves[hop] = [tile]
                             # IF there are more options, one of them might be false, but a later one will be true, ovverriding the false and letting you move even if you shouldnt
                             # Should fix itself with a tree
-                            turnStays = self._CheckNextHop(hop, tile)
+                            self.turnStays[hop] = self._CheckNextHop(hop, tile, False, stone.color)
                             # print("checked", turnStays)
                             break
                         else:
@@ -213,7 +213,7 @@ class GameBoard:
                 if tile == 0 and idx < 1:
                     moves[tilePos] = []
 
-        return moves, turnStays
+        return moves
 
     def _GetQueenMoves(self, stone):
         moves = {}
@@ -244,7 +244,7 @@ class GameBoard:
                             self.forcedMoves[hop] = [tile]
                             # IF there are more options, one of them might be false, but a later one will be true, ovverriding the false and letting you move even if you shouldnt
                             # Should fix itself with a tree
-                            self.turnStays[hop] = self._CheckNextHop(hop, tile)
+                            self.turnStays[hop] = self._CheckNextHop(hop, tile, True)
                             # print("checked", turnStays)
                             break
                         else:
@@ -263,7 +263,7 @@ class GameBoard:
 
         return moves
 
-    def _CheckNextHop(self, positionToCheck, ignoredStone):
+    def _CheckNextHop(self, positionToCheck, ignoredStone, isQueen, color=None):
         # We can only get into this situation by jumping over a stone,
         # so we can safely ignore that one stone (no ugly loops)
 
@@ -272,10 +272,21 @@ class GameBoard:
 
         checkRow, checkCol = positionToCheck
 
-        left = -1
-        up = -1
+        if isQueen:
+            left = -1
+            up = -1
+            checkRange = range(4)
+        else:
+            left = -1
+            checkRange = range(2)
+            if color == WHITE:
+                up = -1
+            elif color == BLACK:
+                up = 1
+            else:
+                raise Exception("Missing color")
 
-        for k in range(4):
+        for k in checkRange:
             # if True:
 
             tiles = {}

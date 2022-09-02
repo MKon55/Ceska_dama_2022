@@ -35,7 +35,9 @@ class Tree:
                                 moveBoard = copy.deepcopy(board.GameBoard)
                                 moveRow, moveCol = move
                                 moveBoard[moveRow][moveCol] = moveBoard[row][col]
+                                moveBoard[moveRow][moveCol].selected = True
                                 moveBoard[row][col] = 0
+                                # Telling the stone it moved
                                 moveBoard[moveRow][moveCol].Move(moveRow, moveCol)
                                 kp = None
                                 if len(killedPiece) == 1:
@@ -46,6 +48,7 @@ class Tree:
                                 # No turnstays, assume we should change turn
                                 turnBool = True
                                 if len(turnStays) != 0:
+                                    print(moves, turnStays)
                                     turnBool = not list(turnStays.values())[idx]
                                 moveNode = Node(selectable, moveBoard, turnBool, kp)
                                 selectable.AddChild(moveNode)
@@ -57,20 +60,33 @@ class Tree:
             testBoard = selectableNode.data
             if self._AreBoardsIdentical(board, testBoard):
                 self.lastSelected = selectableNode
+                # self._PrintBoard(board, selectableNode.data)
 
     def UnselectNode(self):
         self.lastSelected = None
 
-    def _PrintBoard(self, board):
-        s = ""
-        for i in range(ROW):
-            for j in range(COL):
-                if board[i][j] != 0:
-                    s += str(board[i][j].selected) + ", "
-                else:
-                    s += str(board[i][j]) + ", "
-            s += "\n"
-        print(s)
+    def _PrintBoard(self, board, board2=None):
+        c = 1
+        if board2 is not None:
+            c = 2
+        for i in range(c):
+            s = ""
+            for i in range(ROW):
+                for j in range(COL):
+                    if board[i][j] != 0:
+                        from game.stat_values import WHITE
+                        if board[i][j].color == WHITE:
+                            s += "\033[91m"
+                        else:
+                            s += "\033[92m"
+                        s += str("Y" if board[i][j].selected else "N") + ", "
+                        s += "\033[00m"
+                    else:
+                        s += str(board[i][j]) + ", "
+                s += "\n"
+            print(s)
+            print("\n")
+            board = board2
 
     def _AreBoardsIdentical(self, a, b):
         for i in range(ROW):
@@ -84,29 +100,35 @@ class Tree:
             return True
         if (a == 0 and b != 0) or (a != 0 and b == 0):
             return False
-        return (a.color == b.color) and (
-            (
-                isinstance(a, PieceNormal) and isinstance(b, PieceNormal)
-            ) or (
-                isinstance(a, PieceQueen) and isinstance(b, PieceQueen)
-            )
-        )
+        if a.color == b.color:
+            if (isinstance(a, PieceNormal) and isinstance(b, PieceNormal)) or (isinstance(a, PieceQueen) and isinstance(b, PieceQueen)):
+                if (a.selected and b.selected) or (not a.selected and not b.selected):
+                    return True
+        return False
 
     def Move(self, move):
         if self.lastSelected is None:
             return False, False
         board = self._GetBoardWithMove(self.lastSelected.data, move)
+        # self._PrintBoard(board)
         if board is None:
             return False, False
         for moveNode in self.lastSelected.children:
             testBoard = moveNode.data
             if self._AreBoardsIdentical(board, testBoard):
+                # Unselect moved piece
+                moveNode.data = self._DeselecPiece(moveNode.data)
                 self.lastMove = moveNode
                 if moveNode.killedPiece is not None:
                     moveNode.data = self._GetBoardWithKill(moveNode)
                 self.boardReference.GameBoard = moveNode.data
                 return True, moveNode.turnChange
         return False, False
+
+    def _DeselecPiece(self, board):
+        moveSelected = self._GetSelectedStone(board)
+        board[moveSelected.row][moveSelected.col].selected = False
+        return board
 
     def _GetBoardWithMove(self, board, move):
         if board is None:
@@ -117,6 +139,7 @@ class Tree:
             moveRow, moveCol = move
             boardCopy = copy.deepcopy(board)
             boardCopy[moveRow][moveCol] = boardCopy[selRow][selCol]
+            # boardCopy[moveRow][moveCol].selected = True
             boardCopy[selRow][selCol] = 0
             return boardCopy
         return None
@@ -134,16 +157,4 @@ class Tree:
                 stone = board[row][col]
                 if stone != 0 and stone.selected is True:
                     return stone
-        return None
-
-    def GetPossibleMoves(self, board):
-        print("Not working")
-        return
-        for selectableNode in self.lastMove.children:
-            testBoard = selectableNode.data
-            if testBoard == board:
-                # Build the list of moves
-                for moveNode in testBoard.children:
-                    ...
-        # "board" is not in our selectable boards
         return None
