@@ -72,6 +72,8 @@ class GameBoard:
     # Metoda vykreslí hrací kameny a hrací pole => hrací plochu
     def Draw(self, win):
         self.DrawSquares(win)
+
+    def DrawPieces(self, win):
         for row in range(ROW):
             for col in range(COL):
                 stone = self.GameBoard[row][col]
