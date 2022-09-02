@@ -34,7 +34,7 @@ class Tree:
                                 continue
                             selectedBoard = copy.deepcopy(board.GameBoard)
                             selectedBoard[row][col].selected = True
-                            selectable = Node(self.lastMove, selectedBoard, False, None, True)
+                            selectable = Node(self.lastMove, selectedBoard, False, None, True, (row, col))
                             self.lastMove.AddChild(selectable)
                             idx = -1
                             for move, killedPiece in moves.items():
@@ -66,11 +66,11 @@ class Tree:
             testBoard = selectableNode.data
             if self._AreBoardsIdentical(board, testBoard):
                 self.lastSelected = selectableNode
-                # self._PrintBoard(board, selectableNode.data)
 
     def UnselectNode(self):
         self.lastSelected = None
 
+    # Get all availible moves for the selected piece
     def GetMovesForSelected(self):
         if self.lastSelected is None:
             return {}
@@ -82,8 +82,8 @@ class Tree:
 
     def _PruneUnforcedMoves(self):
         for selected in self.lastMove.children:
-            for move in selected.children:
-                print(move)
+            # Only keep forced moves
+            selected.children = [x for x in selected.children if x.forced]
 
     def _PrintBoard(self, board, board2=None):
         c = 1
@@ -129,7 +129,6 @@ class Tree:
         if self.lastSelected is None:
             return False, False
         board = self._GetBoardWithMove(self.lastSelected.data, move)
-        # self._PrintBoard(board)
         if board is None:
             return False, False
         for moveNode in self.lastSelected.children:
