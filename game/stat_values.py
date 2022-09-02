@@ -5,7 +5,7 @@ import pygame
 import pygame_menu
 
 from config.localconfig import PATH
-from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
+from game.screen_manager import WIDTH, WINDOW_WIDTH
 
 # Hodnoty
 ROW, COL = 8, 8  # standartní
@@ -33,6 +33,10 @@ UI_DARKEST = (14, 14, 14)
 WHITE = (198, 25, 44)
 BLACK = (24, 14, 14)
 DEFAULT_COLOR_TURN = WHITE
+
+# Localization
+WHITE_TEXT = "Červená"
+BLACK_TEXT = "Černá  "
 
 # Bude ukazovat možný pohyb po hrací ploše
 GREEN = (64, 255, 64)

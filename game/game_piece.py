@@ -12,7 +12,9 @@ class GamePiece(ABC):
     def __init__(self, row, col, color):
         self.row = row
         self.col = col
+        self.pos = (row, col)
         self.color = color
+        self.selected = False
         self.x = 0  # x pro col
         self.y = 0  # y pro row
         self.CalcPos()
@@ -32,17 +34,10 @@ class GamePiece(ABC):
     def Move(self, row, col):
         self.row = row
         self.col = col
+        self.pos = (row, col)
         self.CalcPos()  # Přepočítání aby byl kámen přesunut na prostředek čtverce
 
     # Metoda vykreslí hrací kámen
     @abstractmethod
     def Draw(self, win):
         pass
-
-
-#Potřeba stále implementovat pohyb hracího kamene (White hráč vždycky začíná jako první pokud není načteno ze partie v .csv)
-#   (Done) Implementace buď ve hrací_kamenu nebo hraci_plocha nebo vlastí specifcký soubor na pohyb
-#   Jak pro hráče tak pro AI
-#   Binární strom pro rozhodávání správného pohybu
-#   (Done) Po stisknutí hracího kamene se zobrazí body na hrací ploše zelené barvy kam se můžeme přesunout
-#       Jinou možnost nám to nedá
