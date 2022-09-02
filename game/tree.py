@@ -55,9 +55,8 @@ class Tree:
                                 # No turnstays, assume we should change turn
                                 turnBool = True
                                 if len(turnStays) != 0:
-                                    print(moves, turnStays)
                                     turnBool = not list(turnStays.values())[idx]
-                                moveNode = Node(selectable, moveBoard, turnBool, kp, movesWereForced)
+                                moveNode = Node(selectable, moveBoard, turnBool, kp, movesWereForced, move)
                                 selectable.AddChild(moveNode)
                                 # Once the GetCorrectMoves is changed to return one killedPiece
                                 # Add code to remove piece from here
@@ -73,7 +72,13 @@ class Tree:
         self.lastSelected = None
 
     def GetMovesForSelected(self):
-        ...
+        if self.lastSelected is None:
+            return {}
+        moves = {}
+        for move in self.lastSelected.children:
+            moves[move.move] = []
+        return moves
+        # {(row, col) = [], (row,col) = []}
 
     def _PruneUnforcedMoves(self):
         for selected in self.lastMove.children:
