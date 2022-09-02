@@ -81,22 +81,6 @@ class GameBoard:
                 stone = self.GameBoard[row][col]
                 if stone != 0:
                     stone.Draw(win)
-    #Metoda pro pohyb
-    #1. pohyb kamene v listu + 2. update
-
-    def Movement(self, stone, row, col):
-        # Prohození pozic hodnot; nemusíme vytvářet temp
-        self.GameBoard[stone.row][stone.col], self.GameBoard[row][col] = self.GameBoard[row][col], self.GameBoard[stone.row][stone.col]
-        stone.Move(row, col)
-
-        #Kontrola zda jsme na pozici kdy se stone může stát queen + update hodnot self.black_queens a self.white_queens
-        if row == ROW - 1 or row == 0:  # Jestliže jsme na pozici 0 nebo 7 tak jsme na konci či začátku hrací plohcy => kámen se stává dámou
-            queen = PieceQueen.fromPiece(stone)
-            self.GameBoard[queen.row][queen.col] = queen
-            if queen.color == BLACK:
-                self.black_queens += 1
-            elif queen.color == WHITE:
-                self.white_queens += 1
 
     #Metoda pro stone aby jsme jej mohli předat do movement v main()
     def GetStone(self, row, col):
@@ -332,9 +316,28 @@ class GameBoard:
         # [0, Stone(), 0]
         # []]
 
-    #Score for AI (better evaluate => better AI) => BLACK is AI, for now (perhaps make it a choise?)
+    # Score for AI (better evaluate => better AI) => BLACK is AI, for now (perhaps make it a choise?)
+    def _GetAIValues(self):
+        black_left, white_left, black_queens, white_queens = 0, 0, 0, 0
+        for row in range(ROW):
+            for col in range(COL):
+                p = self.GameBoard[row][col]
+                if p != 0:
+                    if p.color == WHITE:
+                        if isinstance(p, PieceQueen):
+                            white_queens += 1
+                        else:
+                            white_left += 1
+                    else:
+                        if isinstance(p, PieceQueen):
+                            black_queens += 1
+                        else:
+                            black_left += 1
+        return black_left, white_left, black_queens, white_queens
+
     def evaluate(self):
-        return self.black_left - self.white_left + (self.black_queens * 1.5 - self.white_queens * 1.5)
+        black_left, white_left, black_queens, white_queens = self._GetAIValues()
+        return black_left - white_left + (black_queens * 1.5 - white_queens * 1.5)
         #If AI can jump => AI must jump
 
     #Returns the number of stones of a specific colour
