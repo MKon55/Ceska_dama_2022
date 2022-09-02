@@ -115,7 +115,8 @@ class Gameing:
             stone.selected = True
             self.tree.SelectNode(self.board.GameBoard)
             self.moving = True
-            self.correct_moves, self.turnStays = self.board.GetCorrectMoves(stone)
+            # self.correct_moves = self.tree.GetMovesForSelected()
+            self.correct_moves, self.turnStays, forcedMoves = self.board.GetCorrectMoves(stone)
             self.correct_moves[(stone.row, stone.col)] = []  # Shows which piece is selected
             return True  # Výběr a pohyb je správný -> vrátíme True
 

@@ -7,13 +7,14 @@ import copy
 
 class Tree:
     def __init__(self, headData):
-        self.head = Node(None, headData, False, None)
+        self.head = Node(None, headData, False, None, True)
         self.lastMove = self.head
         self.lastSelected = None
         self.boardReference = None
 
     def AddSelectableStones(self, board, turn):
         self.boardReference = board
+        acceptForcedMovesOnly = False
         for row in range(ROW):
             for col in range(COL):
                 stone = board.GameBoard[row][col]
@@ -22,12 +23,18 @@ class Tree:
                     # Check if its color is the same as turn
                     if stone.color == turn:
                         # Get all moves
-                        moves, turnStays = board.GetCorrectMoves(stone)
+                        moves, turnStays, movesWereForced = board.GetCorrectMoves(stone)
                         # Has availible moves
                         if len(moves) != 0:
+                            if movesWereForced and not acceptForcedMovesOnly:
+                                # If any of the moves are forced, they are the only moves we can play
+                                self._PruneUnforcedMoves()
+                                acceptForcedMovesOnly = True
+                            if acceptForcedMovesOnly and not movesWereForced:
+                                continue
                             selectedBoard = copy.deepcopy(board.GameBoard)
                             selectedBoard[row][col].selected = True
-                            selectable = Node(self.lastMove, selectedBoard, False, None)
+                            selectable = Node(self.lastMove, selectedBoard, False, None, True)
                             self.lastMove.AddChild(selectable)
                             idx = -1
                             for move, killedPiece in moves.items():
@@ -50,7 +57,7 @@ class Tree:
                                 if len(turnStays) != 0:
                                     print(moves, turnStays)
                                     turnBool = not list(turnStays.values())[idx]
-                                moveNode = Node(selectable, moveBoard, turnBool, kp)
+                                moveNode = Node(selectable, moveBoard, turnBool, kp, movesWereForced)
                                 selectable.AddChild(moveNode)
                                 # Once the GetCorrectMoves is changed to return one killedPiece
                                 # Add code to remove piece from here
@@ -64,6 +71,14 @@ class Tree:
 
     def UnselectNode(self):
         self.lastSelected = None
+
+    def GetMovesForSelected(self):
+        ...
+
+    def _PruneUnforcedMoves(self):
+        for selected in self.lastMove.children:
+            for move in selected.children:
+                print(move)
 
     def _PrintBoard(self, board, board2=None):
         c = 1

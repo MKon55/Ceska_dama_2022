@@ -147,9 +147,9 @@ class GameBoard:
             moves.update(queenMoves)
 
         if self.forcedMoves == {}:
-            return moves, turnStays
+            return moves, turnStays, False
         else:
-            return self.forcedMoves, turnStays
+            return self.forcedMoves, turnStays, True
 
     def _isInbounds(self, pos):
         return pos[0] >= 0 and pos[0] < ROW and pos[1] >= 0 and pos[1] < COL
