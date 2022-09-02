@@ -7,7 +7,7 @@
 import pygame
 from datetime import datetime
 
-from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG, WHITE_TEXT, BLACK_TEXT
+from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG, WHITE_TEXT, BLACK_TEXT, DEFAULT_COLOR_TURN
 from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
 from game.turn_indicator import TurnIndicator
 from game.game_over_text import GameOverText
@@ -17,9 +17,10 @@ from game.tree import Tree
 
 
 class Gameing:
-    turn = WHITE
+    turn = DEFAULT_COLOR_TURN
 
     def __init__(self, win):
+        Gameing.turn = DEFAULT_COLOR_TURN
         self._StartCall()
         self.win = win
         self.saveBtn = Button(WIDTH + 110, HEIGHT - 50, "Uložit Hru", self.SaveButtonAction)
