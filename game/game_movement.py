@@ -10,6 +10,7 @@ from datetime import datetime
 from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG, WHITE_TEXT, BLACK_TEXT
 from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
 from game.turn_indicator import TurnIndicator
+from game.game_over_text import GameOverText
 from game.game_board import GameBoard
 from game.button import Button
 from game.tree import Tree
@@ -26,16 +27,23 @@ class Gameing:
         self.buttons = [self.saveBtn, self.backBtn]
         self.turnStays = False
         self.turnIndic = TurnIndicator()
+        self.gameOver = False
+        self.gameOverText = GameOverText()
 
      #Update display, nyní jej nemusíme mít ve main.py
     def Update(self, mouse_pos):
         if self.selecting:
             # print(self.tree._PrintBoard(self.board.GameBoard))
-            self.tree.AddSelectableStones(self.board, self.turn)
+            result = self.tree.AddSelectableStones(self.board, self.turn)
             self.selecting = False
             self.moving = False
+            if result == False:
+                self.gameOver = True
 
         self.board.Draw(self.win)
+
+        if self.gameOver:
+            self.gameOverText.draw(self.win, self.turn)
 
         sidebar = pygame.Rect(WIDTH, 0, WINDOW_WIDTH - WIDTH, WINDOW_HEIGHT)
         pygame.draw.rect(self.win, SIDEBAR_BG, sidebar)

@@ -84,11 +84,6 @@ def Main(loadedGame=None, turn=None, AI=False):
             value, new_board = minimax(game.get_board(), 4, BLACK, game)  # depth = 3, bigger number better ai but longer calculations, value, new board => tuple
             game.AI_move(new_board)
 
-        #Win => ukončení hry, potom můžeme vylepšit
-        if game.GameWinner() is not None:
-            print("The mission, the nightmare... they are finally... over.")
-            game_running = False
-
         pos = pygame.mouse.get_pos()
 
         for event in pygame.event.get():

@@ -60,6 +60,10 @@ class Tree:
                                 selectable.AddChild(moveNode)
                                 # Once the GetCorrectMoves is changed to return one killedPiece
                                 # Add code to remove piece from here
+        if len(self.lastMove.children) == 0:
+            # No pieces left
+            print("game over")
+            return False
 
     def SelectNode(self, board):
         for selectableNode in self.lastMove.children:
