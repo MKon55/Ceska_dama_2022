@@ -1,13 +1,7 @@
-#Vytváří prostředí pro pohyb hry => sestavené tak aby jsme operace ve hře měli mimo main.py
-# - Kdo je na tahu
-# - Kam se můžeme hýbnout
-# - Vybrání hracího kamene a další...
-#Musíme potom ještě implementovat AI pro samotné hraní hry
-
 import pygame
 from datetime import datetime
 
-from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG, WHITE_TEXT, BLACK_TEXT, DEFAULT_COLOR_TURN
+from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG, DEFAULT_COLOR_TURN
 from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
 from game.turn_indicator import TurnIndicator
 from game.game_over_text import GameOverText
@@ -26,19 +20,18 @@ class Gameing:
         self.saveBtn = Button(WIDTH + 110, HEIGHT - 50, "Uložit Hru", self.SaveButtonAction)
         self.backBtn = Button(WIDTH + 140 + self.saveBtn.rect.width, HEIGHT - 50, "Hlavní Menu", self.BackButtonAction)
         self.buttons = [self.saveBtn, self.backBtn]
-        self.turnStays = False
         self.turnIndic = TurnIndicator()
         self.gameOver = False
         self.gameOverText = GameOverText()
 
-     #Update display, nyní jej nemusíme mít ve main.py
+    # Update display, nyní jej nemusíme mít ve main.py
     def Update(self, mouse_pos):
         if self.selecting:
             # print(self.tree._PrintBoard(self.board.GameBoard))
             result = self.tree.AddSelectableStones(self.board, self.turn)
             self.selecting = False
             self.moving = False
-            if result == False:
+            if result is False:
                 self.gameOver = True
 
         self.board.Draw(self.win)
@@ -58,7 +51,6 @@ class Gameing:
 
         # if self.moving:
         self.DrawCorrectMoves(self.correct_moves)
-        # self.DrawCorrectMoves(self.tree.GetPossibleMoves(self.board.GameBoard))
 
         pygame.display.update()
 
@@ -86,11 +78,7 @@ class Gameing:
     def GameWinner(self):
         return self.board.Winner()
 
-    #Resetování hry do původní pozice
-    def Reset(self):
-       self._StartCall()
-
-    #Metoda pro vyběr hracího kamene -> určí row a col -> hýbne s hracím kamenem dle našeho výběru
+    # Metoda pro vyběr hracího kamene -> určí row a col -> hýbne s hracím kamenem dle našeho výběru
     def Select(self, row, col, pos):
         # Check if the click happened on a button
         for btn in self.buttons:
@@ -105,7 +93,6 @@ class Gameing:
 
         if self.selected_stone:
             result, turnChange = self.tree.Move((row, col))
-            # result = self._Move(row, col)
             # #Jestliže náš pohyb není validní tak pohyb nebude proveden a znovu zavoláme metodu Select
             self.selected_stone.selected = False
             self.selected_stone = None
@@ -122,7 +109,7 @@ class Gameing:
                 return True
 
         stone = self.board.GetStone(row, col)
-        #Jestliže hrací kámen který jsme vybrali existuje a vybrali jsme SVOJI barvu
+        # Jestliže hrací kámen který jsme vybrali existuje a vybrali jsme SVOJI barvu
         if stone != 0 and stone.color == self.turn:
             self.selected_stone = stone
             stone.selected = True
@@ -142,28 +129,7 @@ class Gameing:
     def _IsOutsideOfGameboard(self, pos):
         return (pos[0] < 0 or pos[1] < 0 or pos[0] > WIDTH or pos[1] > HEIGHT)
 
-    #Pro pohyb po Select hracího kamene
-    def _Move(self, row, col):
-        stone = self.board.GetStone(row, col)
-        #Jestliže platí že do vybrané pozice == 0 a je ve správném pohybu tak se hýbne
-        if self.selected_stone and stone == 0 and (row, col) in self.correct_moves:
-            self.board.Movement(self.selected_stone, row, col)
-            skipped = self.correct_moves[(row, col)]
-            #Odstranění hracího kamene ze hry pokud byl přeskočen
-            if skipped:
-                self.board.Remove(skipped)
-            #Po provedení pohybu se změní kdo je na tahu -> call turn_change
-            if self.turnStays:
-                self.ChangeTurn()
-                self.turnStays = False
-            self.ChangeTurn()
-        else:
-            return False
-
-        return True
-
-    #Metoda která nám vykreslí možné správné pohyby
-
+    # Metoda která nám vykreslí možné správné pohyby
     def DrawCorrectMoves(self, moves):
         for move in moves:
             row, col = move
@@ -191,13 +157,12 @@ class Gameing:
     def BackButtonAction(self):
         return False
 
-    #Methods for AI
-
-    #Method for gatting board object
+    # Methods for AI
+    # Method for getting board object
     def get_board(self):
         return self.board
 
-    #Method returns new board after AI move => updates game with new board object
+    # Method returns new board after AI move => updates game with new board object
     def AI_move(self, board):
         self.board = board
         self.ChangeTurn()

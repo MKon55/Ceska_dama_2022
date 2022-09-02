@@ -1,4 +1,4 @@
-from game.stat_values import ROW, COL, WHITE, BLACK
+from game.stat_values import ROW, COL, WHITE
 from game.tree_node import Node
 from game.piece_normal import PieceNormal
 from game.piece_queen import PieceQueen
@@ -157,14 +157,6 @@ class Tree:
             if selected.row == 0 or selected.row == ROW - 1:
                 queen = PieceQueen.fromPiece(selected)
                 board[queen.row][queen.col] = queen
-            # if selected.color == WHITE and selected.row == 0:
-            #     # normal white piece at the top edge
-            #     queen = PieceQueen.fromPiece(selected)
-            #     board[queen.row][queen.col] = queen
-            # if selected.color == BLACK and selected.row == ROW - 1:
-            #     # normal black piece at the bottom edge
-            #     queen = PieceQueen.fromPiece(selected)
-            #     board[queen.row][queen.col] = queen
         return board
 
     def _DeselectPiece(self, board, selected):
@@ -180,7 +172,6 @@ class Tree:
             moveRow, moveCol = move
             boardCopy = copy.deepcopy(board)
             boardCopy[moveRow][moveCol] = boardCopy[selRow][selCol]
-            # boardCopy[moveRow][moveCol].selected = True
             boardCopy[selRow][selCol] = 0
             return boardCopy
         return None

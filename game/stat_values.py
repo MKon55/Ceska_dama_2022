@@ -5,7 +5,7 @@ import pygame
 import pygame_menu
 
 from config.localconfig import PATH
-from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
+from game.screen_manager import WIDTH, WINDOW_WIDTH
 
 # Hodnoty
 ROW, COL = 8, 8  # standartní

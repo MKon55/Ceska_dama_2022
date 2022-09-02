@@ -11,10 +11,6 @@ from .piece_queen import PieceQueen
 class GameBoard:
     def __init__(self):
         self._GameBoard = []
-        self.black_left = 12
-        self.white_left = 12
-        self.black_queens = 0
-        self.white_queens = 0
         self.forcedMoves = {}
         self.CreateGameBoard()
 
@@ -35,7 +31,7 @@ class GameBoard:
                 else:
                     self._GameBoard[row].append(0)
 
-    #Metoda pro načtení hrací plochy
+    # Metoda pro načtení hrací plochy
     def LoadBoard(self, board):  # Format: [['a1', 'w'], ['c1', 'w'], ['e1', 'ww']m ... ['b4', 'b']]
         self.ClearBoard()
 
@@ -56,7 +52,7 @@ class GameBoard:
             elif color_and_queen == "ww":
                 self._GameBoard[row][col] = PieceQueen(row, col, WHITE)
 
-    #Vyčištení hrací plochy
+    # Vyčištení hrací plochy
     def ClearBoard(self):
         self._GameBoard = []
         for row in range(ROW):
@@ -82,27 +78,11 @@ class GameBoard:
                 if stone != 0:
                     stone.Draw(win)
 
-    #Metoda pro stone aby jsme jej mohli předat do movement v main()
+    # Metoda pro stone aby jsme jej mohli předat do movement v main()
     def GetStone(self, row, col):
         return self.GameBoard[row][col]
 
-    #Metoda vrátí barvu vítěze, prozatím takto jeduduché ve
-    def Winner(self):
-        if self.white_left <= 0:
-            return BLACK
-        elif self.black_left <= 0:
-            return WHITE
-
-        return None  # Pokud nikdo nevyhraje tak None
-
-#Algoritmus který vezme hrací kámen a pro daný hrací kámen určí všechny možné správné pohyby které může vykonat
-    #Musíme zkontrolovat zda se jedná ho černý nebo bílý hrací kámen
-    # - Jestliže je to černý kámen tak se můžeme hýbat pouze směrem dolů
-    # - Jestliže to je bílí kámen tak se můžeme hýbat pouze směrem nahoru
-    #Jestliže na diaogáne je protihráčům kámen => můžeme ho přeskočit? => jak pro levý či prahý pohyb
-    # - Kontrola dále po diagonále zda můžeme přeskočit
-    #Doublejump rule => Jestliže jsme přeskočili kontrola zda můžeme po diagonále znovu přeskočit
-
+    # Returns all availible moves for the stone
     def GetCorrectMoves(self, stone):
         self.forcedMoves = {}
         self.turnStays = {}
@@ -132,7 +112,6 @@ class GameBoard:
 
     def _GetPieceMoves(self, stone):
         moves = {}
-        turnStays = False
 
         # Starts movement left up
         if stone.color == WHITE:
@@ -298,13 +277,7 @@ class GameBoard:
             return True
         return False
 
-        #Methods for AI
-
-        # Game board visualisation for reference
-        # [[Stone(), 0, Stone()]
-        # [0, Stone(), 0]
-        # []]
-
+    # Methods for AI
     # Score for AI (better evaluate => better AI) => BLACK is AI, for now (perhaps make it a choise?)
     def _GetAIValues(self):
         black_left, white_left, black_queens, white_queens = 0, 0, 0, 0
@@ -327,9 +300,9 @@ class GameBoard:
     def evaluate(self):
         black_left, white_left, black_queens, white_queens = self._GetAIValues()
         return black_left - white_left + (black_queens * 1.5 - white_queens * 1.5)
-        #If AI can jump => AI must jump
+        # If AI can jump => AI must jump
 
-    #Returns the number of stones of a specific colour
+    # Returns the number of stones of a specific colour
     def get_all_stones(self, color):
         stones = []
         for row in self.GameBoard:

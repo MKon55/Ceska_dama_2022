@@ -1,7 +1,7 @@
 import pygame
 
 from game.stat_values import BUTTON_BG, BUTTON_TEXT, BUTTON_HOVER, BUTTON_PRESS, BUTTON_HOVER_TEXT, BUTTON_PRESS_TEXT
-from game.screen_manager import WINDOW_WIDTH, WINDOW_HEIGHT, WIDTH, HEIGHT
+from game.screen_manager import WINDOW_WIDTH, WINDOW_HEIGHT, WIDTH
 
 pygame.font.init()
 main_font = pygame.font.SysFont("calibri", 40)

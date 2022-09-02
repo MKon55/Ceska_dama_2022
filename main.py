@@ -5,8 +5,8 @@ import pygame
 import pygame_menu
 
 # Importování modulu ze game
-from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
-from game.stat_values import SQUARE_SIZE, MENUTHEME, BLACK, WHITE
+from game.screen_manager import WINDOW_WIDTH, WINDOW_HEIGHT
+from game.stat_values import SQUARE_SIZE, MENUTHEME, BLACK
 import game.file_picker
 from game.file_manager import FileManager
 from game.game_movement import Gameing
@@ -42,8 +42,6 @@ def LoadGame(AI=False):
     if pathToFile is None:
         return
     loadedGame, turn = FileManager().ReadFile(pathToFile)
-    # Main([['c3', 'ww'], ['c5', 'bb']], (198, 25, 44), AI=AI)
-    # Main([['c3', 'w'], ['d4', 'b'], ['f4', 'b']], (198, 25, 44), AI=AI)
     Main(loadedGame, turn, AI=AI)
 
 
@@ -79,7 +77,7 @@ def Main(loadedGame=None, turn=None, AI=False):
     while game_running:
         gaming_time.tick(FPS)
 
-        #Method calls minimax algorith on colour
+        # Method calls minimax algorith on colour
         if AI is True and game.turn == BLACK:
             value, new_board = minimax(game.get_board(), 4, BLACK, game)  # depth = 3, bigger number better ai but longer calculations, value, new board => tuple
             game.AI_move(new_board)
@@ -106,14 +104,3 @@ def Main(loadedGame=None, turn=None, AI=False):
 
 
 MainMenu()
-# LoadGame()
-
-
-#vytvoření "předgui" pro načtení ze souboru .csv nebo začátek nové partie
-#   Něco jako Main menu ve hře
-#   Vedle hracího pole ještě počet herních kamenů, počet dám a jaký hráč je na tahu (převděpodobně na pravé straně okna pygame)
-#       Viz Fišerova práce na přednášce
-#Potřeba tedy vytvořit načtení pozic do hracího pole ze .csv souboru (pokusím se implementovat ale mám problém s pochopením)
-#   Zároveň uložit kdykoliv partii do .csv souboru (cyklus který vezmu nynější pozici hracích kamenu a toho kdo je na tahu)
-#   Specifické pojmenování a rozložení dat musí být spleněno jinak exception!!
-#Začátek nové partie již můžeme začít pomocí již daného kodu
