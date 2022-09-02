@@ -1,7 +1,7 @@
 import pygame
 from datetime import datetime
 
-from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG, DEFAULT_COLOR_TURN
+from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG, DEFAULT_COLOR_TURN, LAST_TURN
 from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
 from game.turn_indicator import TurnIndicator
 from game.game_over_text import GameOverText
@@ -49,8 +49,10 @@ class Gameing:
             btn.hover(mouse_pos)
             btn.draw(self.win)
 
-        # if self.moving:
-        self.DrawCorrectMoves(self.correct_moves)
+        self.DrawMoves(self.correct_moves, GREEN, 160)
+        self.DrawMoves(self.last_move, LAST_TURN, 80)
+
+        self.board.DrawPieces(self.win)
 
         pygame.display.update()
 
@@ -63,6 +65,7 @@ class Gameing:
         self.board = GameBoard()
         self.turn = Gameing.turn  # Tah začíná z pravidla bílí
         self.correct_moves = {}  # Ukaže možné správné pohyby pro daného hráče
+        self.last_move = {}
         self.game_running = True  # Flag for main, doesnt actually control if game is running, that's main's job
         self._SetTree()
 
@@ -92,6 +95,9 @@ class Gameing:
             return False
 
         if self.selected_stone:
+            last_move = {}
+            last_move[self.selected_stone.pos] = []
+            last_move[(row, col)] = []
             result, turnChange = self.tree.Move((row, col))
             # #Jestliže náš pohyb není validní tak pohyb nebude proveden a znovu zavoláme metodu Select
             self.selected_stone.selected = False
@@ -103,6 +109,7 @@ class Gameing:
                 self.Select(row, col, pos)
                 return False
             elif result is True:
+                self.last_move = last_move
                 self.selecting = True
                 if turnChange:
                     self.ChangeTurn()
@@ -130,12 +137,12 @@ class Gameing:
         return (pos[0] < 0 or pos[1] < 0 or pos[0] > WIDTH or pos[1] > HEIGHT)
 
     # Metoda která nám vykreslí možné správné pohyby
-    def DrawCorrectMoves(self, moves):
+    def DrawMoves(self, moves, color, alpha):
         for move in moves:
             row, col = move
             s = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE))
-            s.set_alpha(80)
-            s.fill(GREEN)
+            s.set_alpha(alpha)
+            s.fill(color)
             self.win.blit(s, (col * SQUARE_SIZE, row * SQUARE_SIZE))
 
     # Metoda pro změnu tahu
