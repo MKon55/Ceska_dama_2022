@@ -7,8 +7,9 @@
 import pygame
 from datetime import datetime
 
-from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG
+from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG, WHITE_TEXT, BLACK_TEXT
 from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
+from game.turn_indicator import TurnIndicator
 from game.game_board import GameBoard
 from game.button import Button
 from game.tree import Tree
@@ -24,6 +25,7 @@ class Gameing:
         self.backBtn = Button(WIDTH + 140 + self.saveBtn.rect.width, HEIGHT - 50, "Hlavní Menu", self.BackButtonAction)
         self.buttons = [self.saveBtn, self.backBtn]
         self.turnStays = False
+        self.turnIndic = TurnIndicator()
 
      #Update display, nyní jej nemusíme mít ve main.py
     def Update(self, mouse_pos):
@@ -37,6 +39,8 @@ class Gameing:
 
         sidebar = pygame.Rect(WIDTH, 0, WINDOW_WIDTH - WIDTH, WINDOW_HEIGHT)
         pygame.draw.rect(self.win, SIDEBAR_BG, sidebar)
+
+        self.turnIndic.draw(self.win, self.turn)
 
         # Update all the buttons
         for btn in self.buttons:

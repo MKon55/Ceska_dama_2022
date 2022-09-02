@@ -34,6 +34,10 @@ WHITE = (198, 25, 44)
 BLACK = (24, 14, 14)
 DEFAULT_COLOR_TURN = WHITE
 
+# Localization
+WHITE_TEXT = "Červená"
+BLACK_TEXT = "Černá  "
+
 # Bude ukazovat možný pohyb po hrací ploše
 GREEN = (64, 255, 64)
 
