@@ -39,7 +39,8 @@ WHITE_TEXT = "Červená"
 BLACK_TEXT = "Černá  "
 
 # Bude ukazovat možný pohyb po hrací ploše
-GREEN = (64, 255, 64)
+GREEN = (112, 250, 7)
+LAST_TURN = (6, 136, 199)
 
 # Hrací pole barvy
 BOARD_WHITE = (222, 222, 227)
