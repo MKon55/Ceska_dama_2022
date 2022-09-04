@@ -89,50 +89,51 @@ class GameBoard:
         moves = {}  # ukládát pozice (row, col)
         turnStays = {}  # Saves the same number of items as moves, decides if the turn should change/stay
 
-        if isinstance(stone, PieceNormal):
-            pieceMoves = self._GetPieceMoves(stone)
-            turnStays.update(self.turnStays)
-            moves.update(pieceMoves)
+        # Calls method for possible moves + update
+        pieceMoves = self._GetPieceMoves(stone)
+        turnStays.update(self.turnStays)
+        moves.update(pieceMoves)
 
-        if isinstance(stone, PieceQueen):
-            queenMoves = self._GetQueenMoves(stone)
-            turnStays.update(self.turnStays)
-            moves.update(queenMoves)
-
+        # Gets us forced moves according to the rules
         if self.forcedMoves == {}:
             return moves, turnStays, False
         else:
             return self.forcedMoves, turnStays, True
 
+    # Check for game piece 
     def _isInbounds(self, pos):
         return pos[0] >= 0 and pos[0] < ROW and pos[1] >= 0 and pos[1] < COL
 
     def _isGamePiece(self, tile):
         return isinstance(tile, PieceNormal) or isinstance(tile, PieceQueen)
 
+    # Method gets us all possible moves for selected game piece 
     def _GetPieceMoves(self, stone):
         moves = {}
+        # Start for White Normal Piece and Queen Piece 
+        x = 2
+        y = 3
+        left = -1
+        up = -1 
 
-        # Starts movement left up
-        if stone.color == WHITE:
-            left = -1
-            up = -1
-
-        # Starts movement left down
-        if stone.color == BLACK:
+        # Starts movement for black piece 
+        if stone.color == BLACK and isinstance(stone, PieceNormal):
             left = -1
             up = 1
-
-        # For each axis
-        for k in range(2):
-            # Get all the tiles on the axis
+            
+        if isinstance(stone, PieceQueen):
+            x = 4
+            y = 8
+            
+        # For each axis, get all the tiles on the axis
+        for k in range(x):
 
             # Movement for right up
-            if k == 1:
+            if k == 1 and isinstance(stone, PieceNormal):
                 left = -left
 
             tiles = {}
-            for i in range(1, 3):
+            for i in range(1, y):
                 newRow = stone.row + up * i
                 newCol = stone.col + left * i
                 if self._isInbounds((newRow, newCol)):
@@ -140,6 +141,7 @@ class GameBoard:
                 else:
                     break
 
+            # This part of the code is the same 
             idx = -1
             for tilePos, tile in tiles.items():
                 idx += 1
@@ -152,8 +154,10 @@ class GameBoard:
                             self.forcedMoves[hop] = [tile]
                             # IF there are more options, one of them might be false, but a later one will be true, ovverriding the false and letting you move even if you shouldnt
                             # Should fix itself with a tree
-                            self.turnStays[hop] = self._CheckNextHop(hop, tile, False, stone.color)
-                            # print("checked", turnStays)
+                            if isinstance(stone, PieceNormal):
+                                self.turnStays[hop] = self._CheckNextHop(hop, tile, False, stone.color)
+                            if isinstance(stone, PieceQueen):
+                                self.turnStays[hop] = self._CheckNextHop(hop, tile, True)
                             break
                         else:
                             # not empty
@@ -162,56 +166,18 @@ class GameBoard:
                         # fren
                         break
 
-                if tile == 0 and idx < 1:
+                # This part is a mess but it works
+                if tile == 0 and idx < 1 and isinstance(stone, PieceNormal):
+                    moves[tilePos] = []
+                    
+                if tile == 0 and isinstance(stone, PieceQueen):
                     moves[tilePos] = []
 
-        return moves
-
-    def _GetQueenMoves(self, stone):
-        moves = {}
-        left = -1
-        up = -1
-
-        # For each axis
-        for k in range(4):
-            # Get all the tiles on the axis
-            tiles = {}
-            for i in range(1, 8):
-                newRow = stone.row + up * i
-                newCol = stone.col + left * i
-                if self._isInbounds((newRow, newCol)):
-                    tiles[(newRow, newCol)] = (self.GameBoard[newRow][newCol])
-                else:
-                    break
-
-            idx = -1
-            for tilePos, tile in tiles.items():
-                idx += 1
-                if self._isGamePiece(tile):
-                    if tile.color != stone.color:
-                        # enemy
-                        if idx + 1 < len(tiles) and list(tiles.values())[idx + 1] == 0:
-                            # Check if the tile behind enemy is empty
-                            hop = list(tiles.keys())[idx + 1]
-                            self.forcedMoves[hop] = [tile]
-                            # IF there are more options, one of them might be false, but a later one will be true, ovverriding the false and letting you move even if you shouldnt
-                            # Should fix itself with a tree
-                            self.turnStays[hop] = self._CheckNextHop(hop, tile, True)
-                            # print("checked", turnStays)
-                            break
-                        else:
-                            # not empty
-                            break
-                    else:
-                        # fren
-                        break
-
-                if tile == 0:
-                    moves[tilePos] = []
-
-            if k == 1:
+            if k == 1 and isinstance(stone, PieceQueen):
                 up = -up
-            left = -left
+
+            if isinstance(stone, PieceQueen):
+                left = -left
 
         return moves
 
