@@ -31,6 +31,13 @@ class GameBoard:
                 else:
                     self._GameBoard[row].append(0)
 
+    def SetBoard(self, board):
+        self._GameBoard = []
+        for row in range(ROW):
+            self._GameBoard.append([])
+            for col in range(COL):
+                self._GameBoard[row].append(board[row][col])
+
     # Metoda pro načtení hrací plochy
     def LoadBoard(self, board):  # Format: [['a1', 'w'], ['c1', 'w'], ['e1', 'ww']m ... ['b4', 'b']]
         self.ClearBoard()
@@ -102,31 +109,31 @@ class GameBoard:
         else:
             return self.forcedMoves, turnStays, True
 
-    # Check for game piece 
+    # Check for game piece
     def _isInbounds(self, pos):
         return pos[0] >= 0 and pos[0] < ROW and pos[1] >= 0 and pos[1] < COL
 
     def _isGamePiece(self, tile):
         return isinstance(tile, PieceNormal) or isinstance(tile, PieceQueen)
 
-    # Method gets us all possible moves for selected game piece 
+    # Method gets us all possible moves for selected game piece
     def _GetPieceMoves(self, stone):
         moves = {}
-        # Start for White Normal Piece and Queen Piece 
+        # Start for White Normal Piece and Queen Piece
         x = 2
         y = 3
         left = -1
-        up = -1 
+        up = -1
 
-        # Starts movement for black piece 
+        # Starts movement for black piece
         if stone.color == BLACK and isinstance(stone, PieceNormal):
             left = -1
             up = 1
-            
+
         if isinstance(stone, PieceQueen):
             x = 4
             y = 8
-            
+
         # For each axis, get all the tiles on the axis
         for k in range(x):
 
@@ -143,7 +150,7 @@ class GameBoard:
                 else:
                     break
 
-            # This part of the code is the same 
+            # This part of the code is the same
             idx = -1
             for tilePos, tile in tiles.items():
                 idx += 1
@@ -171,7 +178,7 @@ class GameBoard:
                 # This part is a mess but it works
                 if tile == 0 and idx < 1 and isinstance(stone, PieceNormal):
                     moves[tilePos] = []
-                    
+
                 if tile == 0 and isinstance(stone, PieceQueen):
                     moves[tilePos] = []
 

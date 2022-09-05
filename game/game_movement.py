@@ -171,5 +171,35 @@ class Gameing:
 
     # Method returns new board after AI move => updates game with new board object
     def AI_move(self, board):
-        self.board = board
-        self.ChangeTurn()
+        selectedPos, move = self.tree.GetMoveFromBoard(board.GameBoard)
+        print("recieved move:", selectedPos, move)
+        if move is None:
+            # raise Exception("AI move invalid")
+            return
+        import time
+        time.sleep(3)
+        print("selecting")
+        row, col = selectedPos
+        print("clicking", row, col)
+        self.Select(row, col, (0, 0))
+        self.Update((0, 0))
+        time.sleep(3)
+        print("moving")
+        row, col = move
+        print("clicking", row, col)
+        self.Select(row, col, (0, 0))
+        self.Update((0, 0))
+        time.sleep(3)
+        # row, col = selectedPos
+        # stone = self.board.GetStone(row, col)
+        # stone.selected = True
+        # self.tree.SelectNode(self.board.GameBoard)
+        # result, turnChange = self.tree.Move(move)
+        # stone.selected = False
+        # self.tree.UnselectNode()
+        # self.selecting = True
+        # self.moving = False
+        # if turnChange:
+        #     self.ChangeTurn()
+        # # self.board = board
+        # # self.ChangeTurn()

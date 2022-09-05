@@ -2,6 +2,7 @@ from game.stat_values import ROW, COL, WHITE, BLACK
 from game.tree_node import Node
 from game.piece_normal import PieceNormal
 from game.piece_queen import PieceQueen
+from game.game_board import GameBoard
 import copy
 
 
@@ -65,11 +66,14 @@ class Tree:
                                 moveNode = Node(selectable, moveBoard, turnBool, kp, movesWereForced, move)
                                 selectable.AddChild(moveNode)
 
+        winner = None
         if len(parent.children) == 0:
             # No pieces left
-            print("game over")
-            return WHITE if turn == BLACK else BLACK
-        return None
+            winner = WHITE if turn == BLACK else BLACK
+
+        if not addToTree:
+            return winner, self._GetMovesFromNode(parent)
+        return winner
 
     def SelectNode(self, board):
         for selectableNode in self.lastMove.children:
@@ -94,6 +98,20 @@ class Tree:
         for selected in self.lastMove.children:
             # Only keep forced moves
             selected.children = [x for x in selected.children if x.forced]
+
+    def _GetMovesFromNode(self, parent):
+        allMoves = {}
+        i = 0
+        for selectable in parent.children:
+            for move in selectable.children:
+                # Remove killed piece
+                board = self._GetBoardWithKill(move)
+                gameBoard = GameBoard()
+                gameBoard.SetBoard(board)
+                turnChange = move.turnChange
+                allMoves[i] = (gameBoard, turnChange)
+                i += 1
+        return allMoves
 
     def _PrintBoard(self, board, board2=None):
         c = 1
@@ -158,6 +176,16 @@ class Tree:
                 return True, moveNode.turnChange
         return False, False
 
+    def GetMoveFromBoard(self, board):
+        for selectable in self.lastMove.children:
+            for move in selectable.children:
+                # Remove killed piece
+                possibleBoard = self._GetBoardWithKill(move)
+                if self._AreBoardsIdentical(possibleBoard, board):
+                    print("found move:", selectable.move, move.move)
+                    return selectable.move, move.move
+        return None, None
+
     def _UpgradeQueen(self, board, selected):
         if isinstance(selected, PieceNormal):
             if selected.row == 0 or selected.row == ROW - 1:
@@ -188,6 +216,7 @@ class Tree:
             killRow, killCol = node.killedPiece
             board[killRow][killCol] = 0
             return board
+        return copy.deepcopy(node.data)
 
     def _GetSelectedStone(self, board):
         for row in range(ROW):
