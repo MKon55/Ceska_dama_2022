@@ -14,10 +14,10 @@ class Tree:
         self.boardReference = None
 
     def GenerateLevel(self, board, turn, addToTree=True):
-        self.boardReference = board
         acceptForcedMovesOnly = False
 
         if addToTree:
+            self.boardReference = board
             parent = self.lastMove
         else:
             parent = Node(None, board, False, None, True)
@@ -105,7 +105,9 @@ class Tree:
         for selectable in parent.children:
             for move in selectable.children:
                 # Remove killed piece
-                board = self._GetBoardWithKill(move)
+                board = move.data
+                if move.killedPiece is not None:
+                    board = self._GetBoardWithKill(move)
                 gameBoard = GameBoard()
                 gameBoard.SetBoard(board)
                 turnChange = move.turnChange
@@ -180,9 +182,10 @@ class Tree:
         for selectable in self.lastMove.children:
             for move in selectable.children:
                 # Remove killed piece
-                possibleBoard = self._GetBoardWithKill(move)
+                possibleBoard = move.data
+                if move.killedPiece is not None:
+                    possibleBoard = self._GetBoardWithKill(move)
                 if self._AreBoardsIdentical(possibleBoard, board):
-                    print("found move:", selectable.move, move.move)
                     return selectable.move, move.move
         return None, None
 
@@ -216,7 +219,7 @@ class Tree:
             killRow, killCol = node.killedPiece
             board[killRow][killCol] = 0
             return board
-        return copy.deepcopy(node.data)
+        # return copy.deepcopy(node.data)
 
     def _GetSelectedStone(self, board):
         for row in range(ROW):

@@ -36,9 +36,6 @@ class Gameing:
 
         self.board.Draw(self.win)
 
-        if self.gameOver:
-            self.gameOverText.draw(self.win, self.turn)
-
         sidebar = pygame.Rect(WIDTH, 0, WINDOW_WIDTH - WIDTH, WINDOW_HEIGHT)
         pygame.draw.rect(self.win, SIDEBAR_BG, sidebar)
 
@@ -53,6 +50,9 @@ class Gameing:
         self.DrawMoves(self.last_move, LAST_TURN, 80)
 
         self.board.DrawPieces(self.win)
+
+        if self.gameOver:
+            self.gameOverText.draw(self.win, self.turn)
 
         pygame.display.update()
 
@@ -172,34 +172,16 @@ class Gameing:
     # Method returns new board after AI move => updates game with new board object
     def AI_move(self, board):
         selectedPos, move = self.tree.GetMoveFromBoard(board.GameBoard)
-        print("recieved move:", selectedPos, move)
         if move is None:
             # raise Exception("AI move invalid")
             return
-        import time
-        time.sleep(3)
-        print("selecting")
+        # import time
         row, col = selectedPos
-        print("clicking", row, col)
+        # print("clicking", row, col)
         self.Select(row, col, (0, 0))
         self.Update((0, 0))
-        time.sleep(3)
-        print("moving")
+        # time.sleep(1)
         row, col = move
-        print("clicking", row, col)
+        # print("clicking", row, col)
         self.Select(row, col, (0, 0))
         self.Update((0, 0))
-        time.sleep(3)
-        # row, col = selectedPos
-        # stone = self.board.GetStone(row, col)
-        # stone.selected = True
-        # self.tree.SelectNode(self.board.GameBoard)
-        # result, turnChange = self.tree.Move(move)
-        # stone.selected = False
-        # self.tree.UnselectNode()
-        # self.selecting = True
-        # self.moving = False
-        # if turnChange:
-        #     self.ChangeTurn()
-        # # self.board = board
-        # # self.ChangeTurn()

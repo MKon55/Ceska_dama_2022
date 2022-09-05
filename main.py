@@ -79,7 +79,7 @@ def Main(loadedGame=None, turn=None, AI=False):
 
         # Method calls minimax algorith on colour
         if AI is True and game.turn == AI_color:
-            value, new_board = minimax(game.get_board(), 4, float("-inf"), float("inf"), AI_color, game)  # depth = 3, bigger number better ai but longer calculations, value, new board => tuple
+            value, new_board = minimax(game.get_board(), 100, float("-inf"), float("inf"), AI_color, game)  # depth = 3, bigger number better ai but longer calculations, value, new board => tuple
             game.AI_move(new_board)
 
         pos = pygame.mouse.get_pos()
