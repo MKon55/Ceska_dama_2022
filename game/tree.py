@@ -1,4 +1,4 @@
-from game.stat_values import ROW, COL, WHITE
+from game.stat_values import ROW, COL, WHITE, BLACK
 from game.tree_node import Node
 from game.piece_normal import PieceNormal
 from game.piece_queen import PieceQueen
@@ -12,9 +12,15 @@ class Tree:
         self.lastSelected = None
         self.boardReference = None
 
-    def AddSelectableStones(self, board, turn):
+    def GenerateLevel(self, board, turn, addToTree=True):
         self.boardReference = board
         acceptForcedMovesOnly = False
+
+        if addToTree:
+            parent = self.lastMove
+        else:
+            parent = Node(None, board, False, None, True)
+
         for row in range(ROW):
             for col in range(COL):
                 stone = board.GameBoard[row][col]
@@ -34,8 +40,8 @@ class Tree:
                                 continue
                             selectedBoard = copy.deepcopy(board.GameBoard)
                             selectedBoard[row][col].selected = True
-                            selectable = Node(self.lastMove, selectedBoard, False, None, True, (row, col))
-                            self.lastMove.AddChild(selectable)
+                            selectable = Node(parent, selectedBoard, False, None, True, (row, col))
+                            parent.AddChild(selectable)
                             idx = -1
                             for move, killedPiece in moves.items():
                                 idx += 1
@@ -58,12 +64,12 @@ class Tree:
                                     turnBool = not list(turnStays.values())[idx]
                                 moveNode = Node(selectable, moveBoard, turnBool, kp, movesWereForced, move)
                                 selectable.AddChild(moveNode)
-                                # Once the GetCorrectMoves is changed to return one killedPiece
-                                # Add code to remove piece from here
-        if len(self.lastMove.children) == 0:
+
+        if len(parent.children) == 0:
             # No pieces left
             print("game over")
-            return False
+            return WHITE if turn == BLACK else BLACK
+        return None
 
     def SelectNode(self, board):
         for selectableNode in self.lastMove.children:

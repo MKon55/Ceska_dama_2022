@@ -28,10 +28,10 @@ class Gameing:
     def Update(self, mouse_pos):
         if self.selecting:
             # print(self.tree._PrintBoard(self.board.GameBoard))
-            result = self.tree.AddSelectableStones(self.board, self.turn)
+            result = self.tree.GenerateLevel(self.board, self.turn)
             self.selecting = False
             self.moving = False
-            if result is False:
+            if result is not None:
                 self.gameOver = True
 
         self.board.Draw(self.win)
