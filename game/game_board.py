@@ -2,6 +2,8 @@
 # Pohyb hracích kamenů
 
 import pygame
+
+
 # musí být . jinak neví že .py je ve stejné složce
 from .stat_values import BOARD_BLACK, BOARD_WHITE, SQUARE_SIZE, ROW, COL, BLACK, WHITE
 from .piece_normal import PieceNormal
@@ -274,7 +276,11 @@ class GameBoard:
 
     def evaluate(self):
         black_left, white_left, black_queens, white_queens = self._GetAIValues()
-        return black_left - white_left + (black_queens * 1.5 - white_queens * 1.5)
+        from AI_Minimax.algorithm import AI_color
+        if AI_color == BLACK:
+            return black_left - white_left + (black_queens * 1.5 - white_queens * 1.5)
+        else:
+            return white_left - black_left + (white_queens * 1.5 - black_queens * 1.5)
         # If AI can jump => AI must jump
 
     # Returns the number of stones of a specific colour
