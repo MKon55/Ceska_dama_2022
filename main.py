@@ -78,7 +78,6 @@ def Main(loadedGame=None, turn=None, AI=False):
         gaming_time.tick(FPS)
 
         # Method calls minimax algorith on colour
-        # from AI_Minimax.algorithm import AI_color
         if AI is True and game.turn == AI_Minimax.algorithm.AI_color:
             value, new_board = AI_Minimax.algorithm.minimax(game.get_board(), 100, float("-inf"), float("inf"), AI_Minimax.algorithm.AI_color, game)  # depth = 3, bigger number better ai but longer calculations, value, new board => tuple
             game.AI_move(new_board)
