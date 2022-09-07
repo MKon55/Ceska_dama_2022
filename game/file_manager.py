@@ -64,9 +64,13 @@ class FileManager:
 
         base_path = Path(__file__).parent
         file_path = (base_path / f"../saves/{filename}.csv").resolve()
+        # Check if the saves folder exists
+        if not file_path.exists():
+            folder_path = (base_path / "../saves").resolve()
+            folder_path.mkdir(parents=True, exist_ok=True)
         with open(file_path, 'w') as file:
             file.write(save_string)
-        print(f"Saving to {file_path}")
+        # print(f"Saving to {file_path}")
 
     @staticmethod
     def _FormatOutput(row, col, color, queen):
