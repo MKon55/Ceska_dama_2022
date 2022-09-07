@@ -205,13 +205,11 @@ class Gameing:
         return False
 
     def AiWhiteAction(self):
-        AI_Minimax.algorithm.AI_color = WHITE
-        AI_Minimax.algorithm.Player_color = BLACK
-        # ChangeAIColor(WHITE)
+        AI_Minimax.algorithm.ChangeAIColor(WHITE)
         return True
 
     def AiBlackAction(self):
-        # ChangeAIColor(BLACK)
+        AI_Minimax.algorithm.ChangeAIColor(BLACK)
         return True
 
     # Methods for AI
