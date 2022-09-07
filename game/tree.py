@@ -15,6 +15,7 @@ class Tree:
 
     def GenerateLevel(self, board, turn, addToTree=True):
         acceptForcedMovesOnly = False
+        acceptForcedQueenOnly = False
 
         if addToTree:
             self.boardReference = board
@@ -33,17 +34,32 @@ class Tree:
                         moves, turnStays, movesWereForced = board.GetCorrectMoves(stone)
                         # Has availible moves
                         if len(moves) != 0:
-                            if movesWereForced and not acceptForcedMovesOnly:
-                                # If any of the moves are forced, they are the only moves we can play
+                            # Queen has priority over normal piece when taking
+                            if movesWereForced and isinstance(stone, PieceQueen) and not acceptForcedQueenOnly:
+                                # First time a forced queen move appeared
+                                self._PruneAllMoves()
+                                acceptForcedQueenOnly = True
+
+                            # If any of the moves are forced, they are the only moves we can play
+                            if not acceptForcedQueenOnly and movesWereForced and not acceptForcedMovesOnly:
+                                # First time a normal piece has forced moves
                                 self._PruneUnforcedMoves()
                                 acceptForcedMovesOnly = True
+
+                            # We only want forced queens AND either the move was not forced OR stone isnt a queen
+                            # Then move onto the next stone
+                            if acceptForcedQueenOnly and (not movesWereForced or not isinstance(stone, PieceQueen)):
+                                continue
+
                             if acceptForcedMovesOnly and not movesWereForced:
                                 continue
+                            # Make "selected" node
                             selectedBoard = copy.deepcopy(board.GameBoard)
                             selectedBoard[row][col].selected = True
                             selectable = Node(parent, selectedBoard, False, None, True, (row, col))
                             parent.AddChild(selectable)
                             idx = -1
+                            # Add all moves for the selected node
                             for move, killedPiece in moves.items():
                                 idx += 1
                                 moveBoard = copy.deepcopy(board.GameBoard)
@@ -98,6 +114,10 @@ class Tree:
         for selected in self.lastMove.children:
             # Only keep forced moves
             selected.children = [x for x in selected.children if x.forced]
+
+    def _PruneAllMoves(self):
+        for selected in self.lastMove.children:
+            selected.children = []
 
     def _GetMovesFromNode(self, parent):
         allMoves = {}
