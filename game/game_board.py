@@ -193,7 +193,7 @@ class GameBoard:
 
     def _CheckNextHop(self, positionToCheck, ignoredStone, isQueen, color=None):
         # We can only get into this situation by jumping over a stone,
-        # so we can safely ignore that one stone (no ugly loops)
+        # so we can safely ignore that one stone
 
         # Check if there is another stone around
         # if true, look behind it if there is a 0
@@ -215,8 +215,6 @@ class GameBoard:
                 raise Exception("Missing color")
 
         for k in checkRange:
-            # if True:
-
             tiles = {}
             for i in range(1, 3):
                 newRow = checkRow + up * i
@@ -254,7 +252,7 @@ class GameBoard:
         return False
 
     # Methods for AI
-    # Method gets number of black and white stones including queens 
+    # Method gets number of black and white stones including queens
     def _GetAIValues(self):
         black_left, white_left, black_queens, white_queens = 0, 0, 0, 0
         for row in range(ROW):
@@ -281,7 +279,6 @@ class GameBoard:
             return black_left - white_left + (black_queens * 1.5 - white_queens * 1.5)
         else:
             return white_left - black_left + (white_queens * 1.5 - black_queens * 1.5)
-        # If AI can jump => AI must jump
 
     @property
     def GameBoard(self):

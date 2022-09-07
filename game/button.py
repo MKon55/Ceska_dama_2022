@@ -25,10 +25,6 @@ class Button():
         self.func = func
 
     def draw(self, screen):
-        # Button can only exist in the sidebar
-        sidebar = pygame.Rect(WIDTH, 0, WINDOW_WIDTH - WIDTH, WINDOW_HEIGHT)
-        # self.rect = self.rect.clamp(sidebar)
-
         if self.clicking:
             pygame.draw.rect(screen, BUTTON_PRESS, self.rect, border_radius=2)
         elif self.hovering:

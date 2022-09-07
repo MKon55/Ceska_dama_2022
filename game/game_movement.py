@@ -37,6 +37,22 @@ class Gameing:
         self.saveTextRect = self.saveText.get_rect(center=(WIDTH + 110, HEIGHT - 110))
         self.saveTextTimer = 0
 
+    def _StartCall(self):
+        self.selected_stone = None
+        self.board = GameBoard()
+        self.turn = Gameing.turn  # Tah začíná z pravidla bílí
+        self.correct_moves = {}  # Ukaže možné správné pohyby pro daného hráče
+        self.last_move = {}
+        self.game_running = True  # Flag for main, doesnt actually control if game is running, that's main's job
+        self._SetTree()
+
+    def _SetTree(self):
+        self.tree = Tree(self.board)
+        self._GenerateTreeLevel()
+
+    def LoadBoard(self, board):
+        self.board.LoadBoard(board)
+
     # Update display, nyní jej nemusíme mít ve main.py
     def Update(self, mouse_pos):
         if self.aiColorPicking:
@@ -47,13 +63,6 @@ class Gameing:
             self.win.blit(self.aiText, self.aiTextRect)
             pygame.display.update()
             return
-
-        if self.selecting:
-            result = self.tree.GenerateLevel(self.board, self.turn)
-            self.selecting = False
-            self.moving = False
-            if result is not None:
-                self.gameOver = True
 
         self.board.Draw(self.win)
 
@@ -92,26 +101,9 @@ class Gameing:
         if not self.game_running:
             return False
 
-    def _StartCall(self):
-        self.selected_stone = None
-        self.board = GameBoard()
-        self.turn = Gameing.turn  # Tah začíná z pravidla bílí
-        self.correct_moves = {}  # Ukaže možné správné pohyby pro daného hráče
-        self.last_move = {}
-        self.game_running = True  # Flag for main, doesnt actually control if game is running, that's main's job
-        self._SetTree()
-
-    def LoadBoard(self, board):
-        self.board.LoadBoard(board)
-        self._SetTree()
-
-    def _SetTree(self):
-        self.tree = Tree(self.board)
-        self.selecting = True
-        self.moving = False
-
-    # Metoda pro vyběr hracího kamene -> určí row a col -> hýbne s hracím kamenem dle našeho výběru
+    # Action for mouse release
     def Select(self, row, col, pos):
+        # If we play against ai, we let the player choose the ai color before playing
         if self.aiColorPicking:
             for btn in self.aiButtons:
                 btn.release()
@@ -132,24 +124,27 @@ class Gameing:
             return False
 
         if self.selected_stone:
+            # Save last performed move
             last_move = {}
             last_move[self.selected_stone.pos] = []
             last_move[(row, col)] = []
+
             result, turnChange = self.tree.Move((row, col))
+
             # #Jestliže náš pohyb není validní tak pohyb nebude proveden a znovu zavoláme metodu Select
-            self.selected_stone.selected = False
-            self.selected_stone = None
-            self.tree.UnselectNode()
-            self.moving = False
+            self.selected_stone.selected = False  # Tell to stone it's not selected
+            self.selected_stone = None  # Remove selected for Gameing
+            self.tree.UnselectNode()  # Tell the tree to unselect
             self.correct_moves = {}  # Clear the moves when piece is deselected
-            if result is False:
-                self.Select(row, col, pos)
+
+            if result is False:  # Move failed
+                self.Select(row, col, pos)  # Try selecting again
                 return False
             elif result is True:
                 self.last_move = last_move
-                self.selecting = True
                 if turnChange:
                     self.ChangeTurn()
+                self._GenerateTreeLevel()
                 return True
 
         stone = self.board.GetStone(row, col)
@@ -158,22 +153,18 @@ class Gameing:
             self.selected_stone = stone
             stone.selected = True
             self.tree.SelectNode(self.board.GameBoard)
-            self.moving = True
             self.correct_moves = self.tree.GetMovesForSelected()
             self.correct_moves[(stone.row, stone.col)] = []  # Shows which piece is selected
             return True  # Výběr a pohyb je správný -> vrátíme True
 
         return False  # Výběr a pohyb byl nesprávný -> vrátíme False
 
+    # Mousedown action
     def ButtonClick(self, pos):
         for btn in self.aiButtons:
             btn.click(pos)
         for btn in self.buttons:
             btn.click(pos)
-
-    # Check if mouse position (x, y) is outside of the playable area
-    def _IsOutsideOfGameboard(self, pos):
-        return (pos[0] < 0 or pos[1] < 0 or pos[0] > WIDTH or pos[1] > HEIGHT)
 
     # Metoda která nám vykreslí možné správné pohyby
     def DrawMoves(self, moves, color, alpha):
@@ -184,6 +175,10 @@ class Gameing:
             s.fill(color)
             self.win.blit(s, (col * SQUARE_SIZE, row * SQUARE_SIZE))
 
+    # Check if mouse position (x, y) is outside of the playable area
+    def _IsOutsideOfGameboard(self, pos):
+        return (pos[0] < 0 or pos[1] < 0 or pos[0] > WIDTH or pos[1] > HEIGHT)
+
     # Metoda pro změnu tahu
     def ChangeTurn(self):
         self.correct_moves = {}  # Odstraní zelené možnosti po našem tahu
@@ -193,6 +188,12 @@ class Gameing:
     def SetTurn(self, color):
         self.turn = color
         Gameing.turn = self.turn
+        self._SetTree()
+
+    def _GenerateTreeLevel(self):
+        generateResult = self.tree.GenerateLevel(self.board, self.turn)
+        if generateResult is not None:
+            self.gameOver = True
 
     # Button functions
     def SaveButtonAction(self):
@@ -214,7 +215,6 @@ class Gameing:
 
     # Methods for AI
     # Method for getting board object
-
     def get_board(self):
         return self.board
 
@@ -222,16 +222,17 @@ class Gameing:
     def AI_move(self, board):
         selectedPos, move = self.tree.GetMoveFromBoard(board.GameBoard)
         if move is None:
-            # raise Exception("AI move invalid")
             return
+
         import time
         import random
-        row, col = selectedPos
-        # print("clicking", row, col)
+        # Wait some time to give the effect of ai "thinking"
         time.sleep(random.uniform(0.4, 1.5))
+
+        row, col = selectedPos
         self.Select(row, col, (0, 0))
         self.Update((0, 0))
+
         row, col = move
-        # print("clicking", row, col)
         self.Select(row, col, (0, 0))
         self.Update((0, 0))

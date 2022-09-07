@@ -84,7 +84,7 @@ class Tree:
 
         winner = None
         if len(parent.children) == 0:
-            # No pieces left
+            # No pieces / moves left
             winner = WHITE if turn == BLACK else BLACK
 
         if not addToTree:
@@ -135,6 +135,7 @@ class Tree:
                 i += 1
         return allMoves
 
+    # For debug
     def _PrintBoard(self, board, board2=None):
         c = 1
         if board2 is not None:
@@ -239,7 +240,6 @@ class Tree:
             killRow, killCol = node.killedPiece
             board[killRow][killCol] = 0
             return board
-        # return copy.deepcopy(node.data)
 
     def _GetSelectedStone(self, board):
         for row in range(ROW):
