@@ -1,4 +1,5 @@
 import pygame
+import pygame.gfxdraw
 from .game_piece import GamePiece
 from .stat_values import SQUARE_SIZE
 
@@ -10,4 +11,5 @@ class PieceNormal(GamePiece):
 
     def Draw(self, win):
         radius = SQUARE_SIZE//2 - self.PADDING
-        pygame.draw.circle(win, self.color, (self.x, self.y), radius)
+        pygame.gfxdraw.aacircle(win, self.x, self.y, radius, self.color)
+        pygame.gfxdraw.filled_circle(win, self.x, self.y, radius, self.color)

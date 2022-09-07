@@ -174,7 +174,7 @@ class Gameing:
     def SaveButtonAction(self):
         from game.file_manager import FileManager
         stamp = "dama-save-" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        # FileManager.SaveFile(self.board.GameBoard, stamp)
+        FileManager.SaveFile(self.board.GameBoard, stamp)
         self.saveTextTimer = 255
 
     def BackButtonAction(self):
@@ -191,12 +191,12 @@ class Gameing:
         if move is None:
             # raise Exception("AI move invalid")
             return
-        # import time
+        import time
         row, col = selectedPos
         # print("clicking", row, col)
+        time.sleep(1)
         self.Select(row, col, (0, 0))
         self.Update((0, 0))
-        # time.sleep(1)
         row, col = move
         # print("clicking", row, col)
         self.Select(row, col, (0, 0))
