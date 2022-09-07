@@ -1,7 +1,8 @@
 import pygame
 from datetime import datetime
 
-from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG, DEFAULT_COLOR_TURN, LAST_TURN
+from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG, DEFAULT_COLOR_TURN, LAST_TURN, WHITE_TEXT, BLACK_TEXT
+import AI_Minimax.algorithm
 from game.screen_manager import WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
 from game.turn_indicator import TurnIndicator
 from game.game_over_text import GameOverText
@@ -13,24 +14,41 @@ from game.tree import Tree
 class Gameing:
     turn = DEFAULT_COLOR_TURN
 
-    def __init__(self, win):
+    def __init__(self, win, aiPick=False):
         Gameing.turn = DEFAULT_COLOR_TURN
         self._StartCall()
+        self._initUI()
         self.win = win
+        self.gameOver = False
+        self.aiColorPicking = aiPick
+
+    def _initUI(self):
         self.saveBtn = Button(WIDTH + 110, HEIGHT - 50, "Uložit Hru", self.SaveButtonAction)
         self.backBtn = Button(WIDTH + 140 + self.saveBtn.rect.width, HEIGHT - 50, "Hlavní Menu", self.BackButtonAction)
+        self.aiWhiteBtn = Button(WINDOW_WIDTH / 2 - 100, HEIGHT / 2, WHITE_TEXT, self.AiWhiteAction)
+        self.aiBlackBtn = Button(WINDOW_WIDTH / 2 + 100, HEIGHT / 2, BLACK_TEXT, self.AiBlackAction)
+        self.aiButtons = [self.aiWhiteBtn, self.aiBlackBtn]
+        self.aiText = pygame.font.SysFont("calibri", 40).render("Za jakou barvu bude hrát AI?", True, (0, 0, 0))
+        self.aiTextRect = self.aiText.get_rect(center=(WINDOW_WIDTH / 2, HEIGHT / 2 - 100))
         self.buttons = [self.saveBtn, self.backBtn]
         self.turnIndic = TurnIndicator()
-        self.gameOver = False
         self.gameOverText = GameOverText()
-        self.saveText = pygame.font.SysFont("calibri", 40).render("Hra uložena", True, (0, 0, 0, 80))
+        self.saveText = pygame.font.SysFont("calibri", 40).render("Hra uložena", True, (0, 0, 0))
         self.saveTextRect = self.saveText.get_rect(center=(WIDTH + 110, HEIGHT - 110))
         self.saveTextTimer = 0
 
     # Update display, nyní jej nemusíme mít ve main.py
     def Update(self, mouse_pos):
+        if self.aiColorPicking:
+            self.win.fill(SIDEBAR_BG)
+            for btn in self.aiButtons:
+                btn.hover(mouse_pos)
+                btn.draw(self.win)
+            self.win.blit(self.aiText, self.aiTextRect)
+            pygame.display.update()
+            return
+
         if self.selecting:
-            # print(self.tree._PrintBoard(self.board.GameBoard))
             result = self.tree.GenerateLevel(self.board, self.turn)
             self.selecting = False
             self.moving = False
@@ -50,7 +68,6 @@ class Gameing:
             btn.draw(self.win)
 
         # Save confirmation
-        # self.win.blit(self.saveText, self.saveTextRect)
         surface = pygame.Surface(self.saveTextRect.size)
         surface.fill(SIDEBAR_BG)
         surfaceRect = self.saveText.get_rect(topleft=(0, 0))
@@ -95,6 +112,14 @@ class Gameing:
 
     # Metoda pro vyběr hracího kamene -> určí row a col -> hýbne s hracím kamenem dle našeho výběru
     def Select(self, row, col, pos):
+        if self.aiColorPicking:
+            for btn in self.aiButtons:
+                btn.release()
+                # run action for every button, end game if we get False back
+                if btn.action(pos) is True:
+                    self.aiColorPicking = False
+            return None
+
         # Check if the click happened on a button
         for btn in self.buttons:
             btn.release()
@@ -141,6 +166,8 @@ class Gameing:
         return False  # Výběr a pohyb byl nesprávný -> vrátíme False
 
     def ButtonClick(self, pos):
+        for btn in self.aiButtons:
+            btn.click(pos)
         for btn in self.buttons:
             btn.click(pos)
 
@@ -177,8 +204,17 @@ class Gameing:
     def BackButtonAction(self):
         return False
 
+    def AiWhiteAction(self):
+        AI_Minimax.algorithm.ChangeAIColor(WHITE)
+        return True
+
+    def AiBlackAction(self):
+        AI_Minimax.algorithm.ChangeAIColor(BLACK)
+        return True
+
     # Methods for AI
     # Method for getting board object
+
     def get_board(self):
         return self.board
 

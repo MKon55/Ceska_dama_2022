@@ -56,3 +56,10 @@ def minimax(position, depth, alpha, beta, max_player, game, turnChange=True):
             best_move, ignored = list(allMoves.values())[random.randint(0, len(allMoves.values()) - 1)]
 
         return minEvaluate, best_move
+
+
+def ChangeAIColor(color):
+    global AI_color
+    global Player_color
+    AI_color = color
+    Player_color = WHITE if AI_color == BLACK else BLACK
