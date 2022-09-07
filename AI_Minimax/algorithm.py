@@ -13,11 +13,8 @@ Player_color = WHITE if AI_color == BLACK else BLACK
 # Minimax method + alpha-beta pruning => makes computing run faster
 def minimax(position, depth, alpha, beta, max_player, game, turnChange=True):
     # position => current board position, object
-    # print("minimax", position)
-    # gameBoard = GameBoard()
-    # gameBoard.SetBoard(posi)
+
     gameWinner, allMoves = game.tree.GenerateLevel(position, max_player, False)
-    # print(gameWinner, allMoves)
     if depth == 0 or gameWinner is not None:
         return position.evaluate(), position
 
@@ -52,27 +49,3 @@ def minimax(position, depth, alpha, beta, max_player, game, turnChange=True):
                 break
 
         return minEvaluate, best_move
-
-
-# Method for move simulation on temp board
-def possible_move(stone, move, board, game, skip):
-    board.Movement(stone, move[0], move[1])
-    if skip:
-        board.Remove(skip)
-
-    return board
-
-
-# Method gets us all possible moves in current position, Method works with get_all_stones method in game_board
-def get_all_moves(board, colour, game):
-    moves = []  # Stores new board [[board, stone], [new_board, stone]]
-
-    for stone in board.get_all_stones(colour):
-        correct_moves = board.GetCorrectMoves(stone)
-        for move, skip in correct_moves.items():  # Loop for all items (row, col): [stones] if correct
-            temp_board = deepcopy(board)
-            temp_stone = temp_board.GetStone(stone.row, stone.col)
-            new_board = possible_move(temp_stone, move, temp_board, game, skip)  # returns new board after move
-            moves.append(new_board)
-
-    return moves

@@ -93,9 +93,6 @@ class Gameing:
         self.selecting = True
         self.moving = False
 
-    def GameWinner(self):
-        return self.board.Winner()
-
     # Metoda pro vyběr hracího kamene -> určí row a col -> hýbne s hracím kamenem dle našeho výběru
     def Select(self, row, col, pos):
         # Check if the click happened on a button

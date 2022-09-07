@@ -255,7 +255,7 @@ class GameBoard:
         return False
 
     # Methods for AI
-    # Score for AI (better evaluate => better AI) => BLACK is AI, for now (perhaps make it a choise?)
+    # Method gets number of black and white stones including queens 
     def _GetAIValues(self):
         black_left, white_left, black_queens, white_queens = 0, 0, 0, 0
         for row in range(ROW):
@@ -274,6 +274,7 @@ class GameBoard:
                             black_left += 1
         return black_left, white_left, black_queens, white_queens
 
+    #  Score for AI
     def evaluate(self):
         black_left, white_left, black_queens, white_queens = self._GetAIValues()
         from AI_Minimax.algorithm import AI_color
@@ -282,15 +283,6 @@ class GameBoard:
         else:
             return white_left - black_left + (white_queens * 1.5 - black_queens * 1.5)
         # If AI can jump => AI must jump
-
-    # Returns the number of stones of a specific colour
-    def get_all_stones(self, color):
-        stones = []
-        for row in self.GameBoard:
-            for stone in row:
-                if stone != 0 and stone.color == color:
-                    stones.append(stone)
-        return stones
 
     @property
     def GameBoard(self):
