@@ -1,8 +1,6 @@
 # Minimax algorith for AI
 # Copy for board => deepcopy for coping object itself
-from copy import deepcopy
 from game.stat_values import BLACK, WHITE
-from game.game_board import GameBoard
 
 AI_color = BLACK
 Player_color = WHITE if AI_color == BLACK else BLACK
@@ -31,6 +29,7 @@ def minimax(position, depth, alpha, beta, max_player, game, turnChange=True):
             if beta <= alpha:
                 break
 
+        # Chance to make a "wrong" move, so it doesnt always play the same
         import random
         if random.uniform(0, 1) < wrongMoveChance:
             best_move, ignored = list(allMoves.values())[random.randint(0, len(allMoves.values()) - 1)]
@@ -42,7 +41,7 @@ def minimax(position, depth, alpha, beta, max_player, game, turnChange=True):
         best_move = None  # Stores best move we can make
         for moveData in allMoves.values():
             move, turnChange = moveData
-        # for move in get_all_moves(position, Player_color, game):  # For every move eval => calls minimax (recursive)
+            # For every move eval => calls minimax (recursive)
             evaluation = minimax(move, depth-1, alpha, beta, True, game, turnChange)[0]  # returns board and value
             minEvaluate = min(minEvaluate, evaluation)
             beta = min(beta, evaluation)
@@ -51,6 +50,7 @@ def minimax(position, depth, alpha, beta, max_player, game, turnChange=True):
             if beta <= alpha:
                 break
 
+        # Chance to make a "wrong" move, so it doesnt always play the same
         import random
         if random.uniform(0, 1) < wrongMoveChance:
             best_move, ignored = list(allMoves.values())[random.randint(0, len(allMoves.values()) - 1)]
