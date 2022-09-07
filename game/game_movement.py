@@ -192,9 +192,10 @@ class Gameing:
             # raise Exception("AI move invalid")
             return
         import time
+        import random
         row, col = selectedPos
         # print("clicking", row, col)
-        time.sleep(1)
+        time.sleep(random.uniform(0.4, 1.5))
         self.Select(row, col, (0, 0))
         self.Update((0, 0))
         row, col = move
