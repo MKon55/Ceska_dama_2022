@@ -23,8 +23,8 @@ class Gameing:
         self.aiColorPicking = aiPick
 
     def _initUI(self):
-        self.saveBtn = Button(WIDTH + 110, HEIGHT - 50, "Uložit Hru", self.SaveButtonAction)
-        self.backBtn = Button(WIDTH + 140 + self.saveBtn.rect.width, HEIGHT - 50, "Hlavní Menu", self.BackButtonAction)
+        self.saveBtn = Button(WIDTH + (WINDOW_WIDTH - WIDTH) / 2, HEIGHT / 2, "Uložit Hru", self.SaveButtonAction)
+        self.backBtn = Button(WIDTH + (WINDOW_WIDTH - WIDTH) / 2, HEIGHT / 2 + 100, "Hlavní Menu", self.BackButtonAction)
         self.aiWhiteBtn = Button(WINDOW_WIDTH / 2 - 100, HEIGHT / 2, WHITE_TEXT, self.AiWhiteAction)
         self.aiBlackBtn = Button(WINDOW_WIDTH / 2 + 100, HEIGHT / 2, BLACK_TEXT, self.AiBlackAction)
         self.aiButtons = [self.aiWhiteBtn, self.aiBlackBtn]
