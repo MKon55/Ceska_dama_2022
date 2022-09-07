@@ -1,4 +1,6 @@
 import pygame
+import time
+import random
 from datetime import datetime
 
 from .stat_values import BLACK, SQUARE_SIZE, WHITE, GREEN, SIDEBAR_BG, DEFAULT_COLOR_TURN, LAST_TURN, WHITE_TEXT, BLACK_TEXT
@@ -224,8 +226,6 @@ class Gameing:
         if move is None:
             return
 
-        import time
-        import random
         # Wait some time to give the effect of ai "thinking"
         time.sleep(random.uniform(0.4, 1.5))
 
