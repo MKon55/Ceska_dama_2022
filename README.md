@@ -34,9 +34,9 @@ Program by měl podporovat hru dvou hráčů (každý z nich vybírá z přípus
 V souboru jsou přípustné prázdné řádky (= řádky tvořené jen mezerovými znaky)
 
 Čtení musí skončit s výjimkou, pokud:
-- neodpovídá výše uvedenému formátu
-- figura je na nepřípustné pozici (bílé pole, aut)
-- na herním poli je více než jedna figura
+- ✔ neodpovídá výše uvedenému formátu
+- ✔ figura je na nepřípustné pozici (bílé pole, aut)
+- ✔ na herním poli je více než jedna figura
 
 **Možná rozšíření** (jsou zohledněny v rámci zkoušky)
 Následující rozšíření jsou pouze návrhem, fantazii se samozřejmě meze nekladou.
