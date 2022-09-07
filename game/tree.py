@@ -37,13 +37,13 @@ class Tree:
                             # Queen has priority over normal piece when taking
                             if movesWereForced and isinstance(stone, PieceQueen) and not acceptForcedQueenOnly:
                                 # First time a forced queen move appeared
-                                self._PruneAllMoves()
+                                self._PruneAllMoves(parent)
                                 acceptForcedQueenOnly = True
 
                             # If any of the moves are forced, they are the only moves we can play
                             if not acceptForcedQueenOnly and movesWereForced and not acceptForcedMovesOnly:
                                 # First time a normal piece has forced moves
-                                self._PruneUnforcedMoves()
+                                self._PruneUnforcedMoves(parent)
                                 acceptForcedMovesOnly = True
 
                             # We only want forced queens AND either the move was not forced OR stone isnt a queen
@@ -110,13 +110,13 @@ class Tree:
         return moves
         # {(row, col) = [], (row,col) = []}
 
-    def _PruneUnforcedMoves(self):
-        for selected in self.lastMove.children:
+    def _PruneUnforcedMoves(self, parent):
+        for selected in parent.children:
             # Only keep forced moves
             selected.children = [x for x in selected.children if x.forced]
 
-    def _PruneAllMoves(self):
-        for selected in self.lastMove.children:
+    def _PruneAllMoves(self, parent):
+        for selected in parent.children:
             selected.children = []
 
     def _GetMovesFromNode(self, parent):

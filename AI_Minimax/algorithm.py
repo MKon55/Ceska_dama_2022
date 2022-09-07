@@ -6,8 +6,8 @@ from copy import deepcopy
 from game.stat_values import BLACK, WHITE
 from game.game_board import GameBoard
 
-AI_color = WHITE
-Player_color = BLACK
+AI_color = BLACK
+Player_color = WHITE if AI_color == BLACK else BLACK
 
 
 # Minimax method + alpha-beta pruning => makes computing run faster
