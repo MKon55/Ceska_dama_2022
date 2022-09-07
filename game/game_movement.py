@@ -23,6 +23,9 @@ class Gameing:
         self.turnIndic = TurnIndicator()
         self.gameOver = False
         self.gameOverText = GameOverText()
+        self.saveText = pygame.font.SysFont("calibri", 40).render("Hra uložena", True, (0, 0, 0, 80))
+        self.saveTextRect = self.saveText.get_rect(center=(WIDTH + 110, HEIGHT - 110))
+        self.saveTextTimer = 0
 
     # Update display, nyní jej nemusíme mít ve main.py
     def Update(self, mouse_pos):
@@ -48,6 +51,18 @@ class Gameing:
         for btn in self.buttons:
             btn.hover(mouse_pos)
             btn.draw(self.win)
+
+        # Save confirmation
+        # self.win.blit(self.saveText, self.saveTextRect)
+        surface = pygame.Surface(self.saveTextRect.size)
+        surface.fill(SIDEBAR_BG)
+        surfaceRect = self.saveText.get_rect(topleft=(0, 0))
+        surface.blit(self.saveText, surfaceRect)
+        surface.set_alpha(self.saveTextTimer)
+        self.saveTextTimer -= 4
+        if self.saveTextTimer < 0:
+            self.saveTextTimer = 0
+        self.win.blit(surface, self.saveTextRect)
 
         self.DrawMoves(self.correct_moves, GREEN, 160)
         self.DrawMoves(self.last_move, LAST_TURN, 80)
@@ -159,7 +174,8 @@ class Gameing:
     def SaveButtonAction(self):
         from game.file_manager import FileManager
         stamp = "dama-save-" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        FileManager.SaveFile(self.board.GameBoard, stamp)
+        # FileManager.SaveFile(self.board.GameBoard, stamp)
+        self.saveTextTimer = 255
 
     def BackButtonAction(self):
         return False
