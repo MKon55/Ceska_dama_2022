@@ -19,7 +19,7 @@ Zadání společné seminární práce KI/(K)APR2 2022
 - ✔ nalezení všech možných tahů pro všechny figury na desce (včetně všech braní) a filtrování přípustných tahů (pravidlo o přednosti braní, přednost braní dámou)
 - ✔ provedení tahu (aktualizace stavu hry)
 - ✔ zobrazení (vizualizace) stavu hry
-- ? náhodný výběr tahu (ze všech přípustných tahů v dané stavu)
+- ✔ náhodný výběr tahu (ze všech přípustných tahů v dané stavu)
 - ✔ detekce výhry (všechny figury protivníka blokovány nebo protivník ztratil poslední figuru)
 
 Program by měl podporovat hru dvou hráčů (každý z nich vybírá z přípustných tahů, poté co zvolí kámen jímž bude hrát) nebo jednoho hráče (místo druhého hráče se provede náhodný tvar). Po každém tahu se aktualizuje zobrazení stavu hry (resp. se zobrazí nové). Hra (partie) může být zahájena z libovolné možné pozice figura (dané obsahem CSV souboru). Pokud některý z hráčů dosáhne vítězství partie končí.
