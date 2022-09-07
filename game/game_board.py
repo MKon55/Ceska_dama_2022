@@ -1,8 +1,7 @@
 # Vytváří hrací plochu pro dámu
-# Pohyb hracích kamenů
+# Hledá možné pohyby hracích kamenů
 
 import pygame
-
 
 # musí být . jinak neví že .py je ve stejné složce
 from .stat_values import BOARD_BLACK, BOARD_WHITE, SQUARE_SIZE, ROW, COL, BLACK, WHITE

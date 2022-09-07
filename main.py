@@ -1,12 +1,12 @@
 # Hlavní část programu
-# Pro pygame => pip install pygame
+
 import sys
 import pygame
 import pygame_menu
 
 # Importování modulu ze game
 from game.screen_manager import WINDOW_WIDTH, WINDOW_HEIGHT
-from game.stat_values import SQUARE_SIZE, MENUTHEME, BLACK
+from game.stat_values import SQUARE_SIZE, MENUTHEME
 import game.file_picker
 from game.file_manager import FileManager
 from game.game_movement import Gameing

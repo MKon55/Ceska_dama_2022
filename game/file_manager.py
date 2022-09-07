@@ -4,7 +4,6 @@ from pathlib import Path
 from .game_board import GameBoard
 from .game_movement import Gameing
 from .stat_values import WHITE, BLACK, WHITE_CHAR, BLACK_CHAR, WHITE_QUEEN_CHAR, BLACK_QUEEN_CHAR, DEFAULT_COLOR_TURN, WHITE_TURN_CHAR, BLACK_TURN_CHAR
-from .piece_normal import PieceNormal
 from .piece_queen import PieceQueen
 
 
