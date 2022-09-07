@@ -67,7 +67,7 @@ def MainMenu():
 def Main(loadedGame=None, turn=None, AI=False):
     game_running = True
     gaming_time = pygame.time.Clock()  # Ať máme stálou rychlost hry, nemusí být
-    game = Gameing(WIN)
+    game = Gameing(WIN, aiPick=AI)
 
     # Load a game if we get a board
     if loadedGame is not None:
@@ -78,6 +78,7 @@ def Main(loadedGame=None, turn=None, AI=False):
         gaming_time.tick(FPS)
 
         # Method calls minimax algorith on colour
+        print(AI_color)
         if AI is True and game.turn == AI_color:
             value, new_board = minimax(game.get_board(), 100, float("-inf"), float("inf"), AI_color, game)  # depth = 3, bigger number better ai but longer calculations, value, new board => tuple
             game.AI_move(new_board)
