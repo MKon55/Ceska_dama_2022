@@ -1,7 +1,8 @@
-from game.stat_values import ROW, COL, WHITE
+from game.stat_values import ROW, COL, WHITE, BLACK
 from game.tree_node import Node
 from game.piece_normal import PieceNormal
 from game.piece_queen import PieceQueen
+from game.game_board import GameBoard
 import copy
 
 
@@ -12,9 +13,15 @@ class Tree:
         self.lastSelected = None
         self.boardReference = None
 
-    def AddSelectableStones(self, board, turn):
-        self.boardReference = board
+    def GenerateLevel(self, board, turn, addToTree=True):
         acceptForcedMovesOnly = False
+
+        if addToTree:
+            self.boardReference = board
+            parent = self.lastMove
+        else:
+            parent = Node(None, board, False, None, True)
+
         for row in range(ROW):
             for col in range(COL):
                 stone = board.GameBoard[row][col]
@@ -34,8 +41,8 @@ class Tree:
                                 continue
                             selectedBoard = copy.deepcopy(board.GameBoard)
                             selectedBoard[row][col].selected = True
-                            selectable = Node(self.lastMove, selectedBoard, False, None, True, (row, col))
-                            self.lastMove.AddChild(selectable)
+                            selectable = Node(parent, selectedBoard, False, None, True, (row, col))
+                            parent.AddChild(selectable)
                             idx = -1
                             for move, killedPiece in moves.items():
                                 idx += 1
@@ -58,12 +65,15 @@ class Tree:
                                     turnBool = not list(turnStays.values())[idx]
                                 moveNode = Node(selectable, moveBoard, turnBool, kp, movesWereForced, move)
                                 selectable.AddChild(moveNode)
-                                # Once the GetCorrectMoves is changed to return one killedPiece
-                                # Add code to remove piece from here
-        if len(self.lastMove.children) == 0:
+
+        winner = None
+        if len(parent.children) == 0:
             # No pieces left
-            print("game over")
-            return False
+            winner = WHITE if turn == BLACK else BLACK
+
+        if not addToTree:
+            return winner, self._GetMovesFromNode(parent)
+        return winner
 
     def SelectNode(self, board):
         for selectableNode in self.lastMove.children:
@@ -88,6 +98,22 @@ class Tree:
         for selected in self.lastMove.children:
             # Only keep forced moves
             selected.children = [x for x in selected.children if x.forced]
+
+    def _GetMovesFromNode(self, parent):
+        allMoves = {}
+        i = 0
+        for selectable in parent.children:
+            for move in selectable.children:
+                # Remove killed piece
+                board = move.data
+                if move.killedPiece is not None:
+                    board = self._GetBoardWithKill(move)
+                gameBoard = GameBoard()
+                gameBoard.SetBoard(board)
+                turnChange = move.turnChange
+                allMoves[i] = (gameBoard, turnChange)
+                i += 1
+        return allMoves
 
     def _PrintBoard(self, board, board2=None):
         c = 1
@@ -152,6 +178,17 @@ class Tree:
                 return True, moveNode.turnChange
         return False, False
 
+    def GetMoveFromBoard(self, board):
+        for selectable in self.lastMove.children:
+            for move in selectable.children:
+                # Remove killed piece
+                possibleBoard = move.data
+                if move.killedPiece is not None:
+                    possibleBoard = self._GetBoardWithKill(move)
+                if self._AreBoardsIdentical(possibleBoard, board):
+                    return selectable.move, move.move
+        return None, None
+
     def _UpgradeQueen(self, board, selected):
         if isinstance(selected, PieceNormal):
             if selected.row == 0 or selected.row == ROW - 1:
@@ -182,6 +219,7 @@ class Tree:
             killRow, killCol = node.killedPiece
             board[killRow][killCol] = 0
             return board
+        # return copy.deepcopy(node.data)
 
     def _GetSelectedStone(self, board):
         for row in range(ROW):

@@ -28,16 +28,13 @@ class Gameing:
     def Update(self, mouse_pos):
         if self.selecting:
             # print(self.tree._PrintBoard(self.board.GameBoard))
-            result = self.tree.AddSelectableStones(self.board, self.turn)
+            result = self.tree.GenerateLevel(self.board, self.turn)
             self.selecting = False
             self.moving = False
-            if result is False:
+            if result is not None:
                 self.gameOver = True
 
         self.board.Draw(self.win)
-
-        if self.gameOver:
-            self.gameOverText.draw(self.win, self.turn)
 
         sidebar = pygame.Rect(WIDTH, 0, WINDOW_WIDTH - WIDTH, WINDOW_HEIGHT)
         pygame.draw.rect(self.win, SIDEBAR_BG, sidebar)
@@ -53,6 +50,9 @@ class Gameing:
         self.DrawMoves(self.last_move, LAST_TURN, 80)
 
         self.board.DrawPieces(self.win)
+
+        if self.gameOver:
+            self.gameOverText.draw(self.win, self.turn)
 
         pygame.display.update()
 
@@ -171,5 +171,17 @@ class Gameing:
 
     # Method returns new board after AI move => updates game with new board object
     def AI_move(self, board):
-        self.board = board
-        self.ChangeTurn()
+        selectedPos, move = self.tree.GetMoveFromBoard(board.GameBoard)
+        if move is None:
+            # raise Exception("AI move invalid")
+            return
+        # import time
+        row, col = selectedPos
+        # print("clicking", row, col)
+        self.Select(row, col, (0, 0))
+        self.Update((0, 0))
+        # time.sleep(1)
+        row, col = move
+        # print("clicking", row, col)
+        self.Select(row, col, (0, 0))
+        self.Update((0, 0))
